@@ -1,0 +1,235 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/types"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub const COT_ACTIVATION : Int = 6
+
+pub const COT_ACTIVATION_CON : Int = 7
+
+pub const COT_ACTIVATION_TERMINATED : Int = 10
+
+pub const COT_BACKGROUND : Int = 2
+
+pub const COT_DEACTIVATION : Int = 8
+
+pub const COT_DEACTIVATION_CON : Int = 9
+
+pub const COT_INITIALIZED : Int = 4
+
+pub const COT_INTERROGATED_GROUP_1 : Int = 21
+
+pub const COT_INTERROGATED_STATION : Int = 20
+
+pub const COT_PERIODIC : Int = 1
+
+pub const COT_REQUEST : Int = 5
+
+pub const COT_RETURN_INFO_LOCAL : Int = 12
+
+pub const COT_RETURN_INFO_REMOTE : Int = 11
+
+pub const COT_SPONTANEOUS : Int = 3
+
+pub const COT_UNKNOWN_CASDU : Int = 46
+
+pub const COT_UNKNOWN_COT : Int = 45
+
+pub const COT_UNKNOWN_IOA : Int = 47
+
+pub const COT_UNKNOWN_TYPE_ID : Int = 44
+
+pub const MAX_APDU_LEN : Int = 255
+
+pub const MIN_APDU_LEN : Int = 6
+
+pub const QCC_GENERAL_RESET : Byte = b'\x05'
+
+pub const QOI_STATION_GI : Byte = b'\x14'
+
+pub const START_BYTE : Byte = b'\x68'
+
+pub const TYPE_C_CI_NA_1 : Byte = b'\x65'
+
+pub const TYPE_C_CS_NA_1 : Byte = b'\x67'
+
+pub const TYPE_C_DC_NA_1 : Byte = b'\x2E'
+
+pub const TYPE_C_IC_NA_1 : Byte = b'\x64'
+
+pub const TYPE_C_RC_NA_1 : Byte = b'\x2F'
+
+pub const TYPE_C_RD_NA_1 : Byte = b'\x66'
+
+pub const TYPE_C_RP_NA_1 : Byte = b'\x69'
+
+pub const TYPE_C_SC_NA_1 : Byte = b'\x2D'
+
+pub const TYPE_C_SE_NA_1 : Byte = b'\x30'
+
+pub const TYPE_C_SE_NB_1 : Byte = b'\x31'
+
+pub const TYPE_C_SE_NC_1 : Byte = b'\x32'
+
+pub const TYPE_C_TS_NA_1 : Byte = b'\x68'
+
+pub const TYPE_M_BO_NA_1 : Byte = b'\x07'
+
+pub const TYPE_M_DP_NA_1 : Byte = b'\x03'
+
+pub const TYPE_M_DP_TA_1 : Byte = b'\x04'
+
+pub const TYPE_M_DP_TB_1 : Byte = b'\x1F'
+
+pub const TYPE_M_IT_NA_1 : Byte = b'\x0F'
+
+pub const TYPE_M_IT_TA_1 : Byte = b'\x10'
+
+pub const TYPE_M_IT_TB_1 : Byte = b'\x25'
+
+pub const TYPE_M_ME_NA_1 : Byte = b'\x09'
+
+pub const TYPE_M_ME_NB_1 : Byte = b'\x0B'
+
+pub const TYPE_M_ME_NC_1 : Byte = b'\x0D'
+
+pub const TYPE_M_ME_TA_1 : Byte = b'\x0A'
+
+pub const TYPE_M_ME_TB_1 : Byte = b'\x0C'
+
+pub const TYPE_M_ME_TC_1 : Byte = b'\x0E'
+
+pub const TYPE_M_ME_TD_1 : Byte = b'\x22'
+
+pub const TYPE_M_ME_TE_1 : Byte = b'\x23'
+
+pub const TYPE_M_ME_TF_1 : Byte = b'\x24'
+
+pub const TYPE_M_SP_NA_1 : Byte = b'\x01'
+
+pub const TYPE_M_SP_TA_1 : Byte = b'\x02'
+
+pub const TYPE_M_SP_TB_1 : Byte = b'\x1E'
+
+pub const TYPE_M_ST_NA_1 : Byte = b'\x05'
+
+pub const TYPE_M_ST_TA_1 : Byte = b'\x06'
+
+pub const TYPE_M_ST_TB_1 : Byte = b'\x20'
+
+// Errors
+
+// Types and methods
+pub struct CASDU {
+  address : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn CASDU::address(Self) -> Int
+pub fn CASDU::from_bytes(Array[Byte]) -> Result[Self, String]
+pub fn CASDU::is_broadcast(Self) -> Bool
+pub fn CASDU::new(Int) -> Self
+pub fn CASDU::to_bytes(Self) -> Array[Byte]
+
+pub struct CP24Time2a {
+  milliseconds : Int
+  minutes : Int
+  invalid : Bool
+} derive(Eq, @debug.Debug)
+pub fn CP24Time2a::create(milliseconds? : Int, minutes? : Int, invalid? : Bool) -> Self
+pub fn CP24Time2a::from_bytes(Array[Byte]) -> Result[Self, String]
+pub fn CP24Time2a::to_bytes(Self) -> Array[Byte]
+
+pub struct CP56Time2a {
+  milliseconds : Int
+  minutes : Int
+  invalid : Bool
+  substituted : Bool
+  hours : Int
+  day_of_week : Int
+  day_of_month : Int
+  month : Int
+  year : Int
+} derive(Eq, @debug.Debug)
+pub fn CP56Time2a::create(milliseconds? : Int, minutes? : Int, invalid? : Bool, substituted? : Bool, hours? : Int, day_of_week? : Int, day_of_month? : Int, month? : Int, year? : Int) -> Self
+pub fn CP56Time2a::day_of_month(Self) -> Int
+pub fn CP56Time2a::day_of_week(Self) -> Int
+pub fn CP56Time2a::default() -> Self
+pub fn CP56Time2a::from_bytes(Array[Byte]) -> Result[Self, String]
+pub fn CP56Time2a::hours(Self) -> Int
+pub fn CP56Time2a::milliseconds(Self) -> Int
+pub fn CP56Time2a::minutes(Self) -> Int
+pub fn CP56Time2a::month(Self) -> Int
+pub fn CP56Time2a::to_bytes(Self) -> Array[Byte]
+pub fn CP56Time2a::to_string(Self) -> String
+pub fn CP56Time2a::year(Self) -> Int
+
+pub struct CommandQualifier {
+  state : Bool
+  select_execute : Bool
+  pulse_duration : Int
+} derive(Eq, @debug.Debug)
+pub fn CommandQualifier::create(state? : Bool, select_execute? : Bool, pulse_duration? : Int) -> Self
+pub fn CommandQualifier::from_byte(Byte) -> Self
+pub fn CommandQualifier::pulse_duration(Self) -> Int
+pub fn CommandQualifier::select_execute(Self) -> Bool
+pub fn CommandQualifier::state(Self) -> Bool
+pub fn CommandQualifier::to_byte(Self) -> Byte
+
+pub struct DIQ {
+  dpi : Int
+  invalid : Bool
+  not_topical : Bool
+  substituted : Bool
+  blocked : Bool
+} derive(Eq, @debug.Debug)
+pub fn DIQ::create(dpi? : Int, invalid? : Bool, not_topical? : Bool, substituted? : Bool, blocked? : Bool) -> Self
+pub fn DIQ::dpi(Self) -> Int
+pub fn DIQ::from_byte(Byte) -> Self
+pub fn DIQ::invalid(Self) -> Bool
+pub fn DIQ::to_byte(Self) -> Byte
+
+pub struct IOA {
+  value : Int
+} derive(Eq, Hash, @debug.Debug)
+pub fn IOA::from_bytes(Array[Byte]) -> Result[Self, String]
+pub fn IOA::new(Int) -> Self
+pub fn IOA::to_bytes(Self) -> Array[Byte]
+pub fn IOA::to_string(Self) -> String
+pub fn IOA::value(Self) -> Int
+
+pub struct QDS {
+  invalid : Bool
+  not_topical : Bool
+  substituted : Bool
+  blocked : Bool
+  overflow : Bool
+} derive(Eq, @debug.Debug)
+pub fn QDS::blocked(Self) -> Bool
+pub fn QDS::create(invalid? : Bool, not_topical? : Bool, substituted? : Bool, blocked? : Bool, overflow? : Bool) -> Self
+pub fn QDS::default() -> Self
+pub fn QDS::from_byte(Byte) -> Self
+pub fn QDS::invalid(Self) -> Bool
+pub fn QDS::not_topical(Self) -> Bool
+pub fn QDS::overflow(Self) -> Bool
+pub fn QDS::substituted(Self) -> Bool
+pub fn QDS::to_byte(Self) -> Byte
+
+pub struct SIQ {
+  value : Bool
+  invalid : Bool
+  not_topical : Bool
+  substituted : Bool
+  blocked : Bool
+} derive(Eq, @debug.Debug)
+pub fn SIQ::create(value? : Bool, invalid? : Bool, not_topical? : Bool, substituted? : Bool, blocked? : Bool) -> Self
+pub fn SIQ::from_byte(Byte) -> Self
+pub fn SIQ::invalid(Self) -> Bool
+pub fn SIQ::to_byte(Self) -> Byte
+pub fn SIQ::value(Self) -> Bool
+
+// Type aliases
+
+// Traits
+
