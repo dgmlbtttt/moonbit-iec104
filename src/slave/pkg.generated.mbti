@@ -1,0 +1,53 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/slave"
+
+import {
+  "dgmlbtttt/iec104/src/apdu",
+  "dgmlbtttt/iec104/src/asdu",
+  "dgmlbtttt/iec104/src/state_machine",
+  "dgmlbtttt/iec104/src/types",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct PointDatabase {
+  single_points : Map[Int, Bool]
+  double_points : Map[Int, Int]
+  telemetry_norm : Map[Int, Int]
+  telemetry_float : Map[Int, Double]
+  energy_counters : Map[Int, Int64]
+} derive(Eq, @debug.Debug)
+pub fn PointDatabase::build_gi_asdus(Self, @types.CASDU) -> Array[@asdu.ASDU]
+pub fn PointDatabase::get_double_point(Self, Int) -> Int?
+pub fn PointDatabase::get_energy_counter(Self, Int) -> Int64?
+pub fn PointDatabase::get_single_point(Self, Int) -> Bool?
+pub fn PointDatabase::get_telemetry_float(Self, Int) -> Double?
+pub fn PointDatabase::get_telemetry_norm(Self, Int) -> Int?
+pub fn PointDatabase::new() -> Self
+pub fn PointDatabase::set_double_point(Self, Int, Int) -> Unit
+pub fn PointDatabase::set_energy_counter(Self, Int, Int64) -> Unit
+pub fn PointDatabase::set_single_point(Self, Int, Bool) -> Unit
+pub fn PointDatabase::set_telemetry_float(Self, Int, Double) -> Unit
+pub fn PointDatabase::set_telemetry_norm(Self, Int, Int) -> Unit
+
+pub struct SlaveNode {
+  casdu : @types.CASDU
+  db : PointDatabase
+  conn : @state_machine.ConnectionState
+  spontaneous_queue : Array[@asdu.ASDU]
+} derive(Eq, @debug.Debug)
+pub fn SlaveNode::casdu(Self) -> @types.CASDU
+pub fn SlaveNode::conn(Self) -> @state_machine.ConnectionState
+pub fn SlaveNode::db(Self) -> PointDatabase
+pub fn SlaveNode::handle_apdu(Self, @apdu.APDU) -> Result[Array[@apdu.APDU], String]
+pub fn SlaveNode::new(Int) -> Self
+pub fn SlaveNode::report_spontaneous_single_point(Self, Int, Bool) -> Result[@apdu.APDU, String]
+
+// Type aliases
+
+// Traits
+
