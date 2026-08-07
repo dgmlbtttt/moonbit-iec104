@@ -19,45 +19,36 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup MoonBit Toolchain
-        shell: pwsh
+      - name: Setup MoonBit Toolchain (Linux / macOS)
+        if: runner.os != 'Windows'
+        run: |
+          curl -sSfL -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" https://cli.moonbitlang.com/install/bash.sh | bash
+          echo "$HOME/.moon/bin" >> $GITHUB_PATH
+
+      - name: Setup MoonBit Toolchain (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
         run: |
           irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
-          $binDir = Join-Path $HOME ".moon" "bin"
-          if (-not (Test-Path $binDir)) {
-            $binDir = Join-Path $env:USERPROFILE ".moon" "bin"
-          }
-          echo "$binDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Check Code Formatting & Warnings
-        shell: pwsh
+        shell: bash
         run: |
-          $binDir = Join-Path $HOME ".moon" "bin"
-          if (-not (Test-Path $binDir)) {
-            $binDir = Join-Path $env:USERPROFILE ".moon" "bin"
-          }
-          $env:PATH = "$binDir;$env:PATH"
+          export PATH="$HOME/.moon/bin:$USERPROFILE/.moon/bin:$PATH"
           moon version
           moon fmt --check
           moon check --deny-warn
           moon info
 
       - name: Execute Unit Test Suite
-        shell: pwsh
+        shell: bash
         run: |
-          $binDir = Join-Path $HOME ".moon" "bin"
-          if (-not (Test-Path $binDir)) {
-            $binDir = Join-Path $env:USERPROFILE ".moon" "bin"
-          }
-          $env:PATH = "$binDir;$env:PATH"
+          export PATH="$HOME/.moon/bin:$USERPROFILE/.moon/bin:$PATH"
           moon test --deny-warn
 
       - name: Execute CLI Demonstration
-        shell: pwsh
+        shell: bash
         run: |
-          $binDir = Join-Path $HOME ".moon" "bin"
-          if (-not (Test-Path $binDir)) {
-            $binDir = Join-Path $env:USERPROFILE ".moon" "bin"
-          }
-          $env:PATH = "$binDir;$env:PATH"
+          export PATH="$HOME/.moon/bin:$USERPROFILE/.moon/bin:$PATH"
           moon run cmd/main
