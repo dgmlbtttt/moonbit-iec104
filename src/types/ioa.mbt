@@ -1,6 +1,7 @@
 // MoonBit IEC 104 - Information Object Address (IOA) & Common Address (CASDU)
 
 // 24-bit 3-Byte Information Object Address
+
 ///|
 pub struct IOA {
   value : Int // 0..16777215 (0x000000..0xFFFFFF)

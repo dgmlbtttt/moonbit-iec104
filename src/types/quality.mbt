@@ -1,6 +1,7 @@
 // MoonBit IEC 104 - Quality Descriptors and Control Command Flags
 
 // Quality Descriptor for Telemetry (QDS)
+
 ///|
 pub struct QDS {
   invalid : Bool // IV (bit 7): 0=valid, 1=invalid

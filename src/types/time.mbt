@@ -1,6 +1,7 @@
 // MoonBit IEC 104 - Protocol Time Tag Representations (CP56Time2a & CP24Time2a)
 
 // 7-Byte Full Time Tag (CP56Time2a)
+
 ///|
 pub struct CP56Time2a {
   milliseconds : Int // 0..59999 (2 bytes LE)

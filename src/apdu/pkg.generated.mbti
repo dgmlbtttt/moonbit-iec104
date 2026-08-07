@@ -1,0 +1,66 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/apdu"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn encode_apdu(APDU) -> Array[Byte]
+
+pub fn parse_apdu(Array[Byte]) -> Result[APDU, String]
+
+// Errors
+
+// Types and methods
+pub enum APDU {
+  IFormat(Int, Int, Array[Byte])
+  SFormat(Int)
+  UFormat(UFrameType)
+} derive(Eq, @debug.Debug)
+pub fn APDU::frame_type_name(Self) -> String
+pub fn APDU::make_i(Int, Int, Array[Byte]) -> Self
+pub fn APDU::make_s(Int) -> Self
+pub fn APDU::make_u(UFrameType) -> Self
+
+pub struct SequenceManager {
+  mut send_seq : Int
+  mut recv_seq : Int
+  mut ack_seq : Int
+  max_unacked : Int
+  ack_threshold : Int
+  mut unacked_count : Int
+} derive(Eq, @debug.Debug)
+pub fn SequenceManager::ack_seq(Self) -> Int
+pub fn SequenceManager::can_send_i_frame(Self) -> Bool
+pub fn SequenceManager::confirm_recv(Self, Int) -> Result[Unit, String]
+pub fn SequenceManager::new(max_unacked? : Int, ack_threshold? : Int) -> Self
+pub fn SequenceManager::next_send_seq(Self) -> Int
+pub fn SequenceManager::recv_seq(Self) -> Int
+pub fn SequenceManager::reset(Self) -> Unit
+pub fn SequenceManager::send_seq(Self) -> Int
+pub fn SequenceManager::should_send_s_frame(Self) -> Bool
+pub fn SequenceManager::unacked_count(Self) -> Int
+pub fn SequenceManager::update_ack(Self, Int) -> Unit
+
+pub enum UFrameType {
+  StartDTAct
+  StartDTCon
+  StopDTAct
+  StopDTCon
+  TestFRAct
+  TestFRCon
+} derive(Eq, @debug.Debug)
+pub fn UFrameType::from_byte(Byte) -> Result[Self, String]
+pub fn UFrameType::start_dt_act() -> Self
+pub fn UFrameType::start_dt_con() -> Self
+pub fn UFrameType::stop_dt_act() -> Self
+pub fn UFrameType::stop_dt_con() -> Self
+pub fn UFrameType::test_fr_act() -> Self
+pub fn UFrameType::test_fr_con() -> Self
+pub fn UFrameType::to_byte(Self) -> Byte
+
+// Type aliases
+
+// Traits
+
