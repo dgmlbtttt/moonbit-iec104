@@ -1,0 +1,79 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/utils"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn bits_to_float32(Int64) -> Double
+
+pub fn byte_to_hex(Byte) -> String
+
+pub fn bytes_to_hex_string(Array[Byte]) -> String
+
+pub fn calculate_crc16_modbus(Array[Byte], Int, Int) -> Int
+
+pub fn calculate_sum8(Array[Byte], Int, Int) -> Byte
+
+pub fn calculate_xor8(Array[Byte], Int, Int) -> Byte
+
+pub fn clamp_float(Float, Float, Float) -> Float
+
+pub fn clamp_int(Int, Int, Int) -> Int
+
+pub fn extract_field(Byte, Int, Int) -> Int
+
+pub fn float32_to_bits(Double) -> Int64
+
+pub fn format_sequence_no(Int) -> String
+
+pub fn get_bit(Byte, Int) -> Bool
+
+pub fn hex_char_to_val(Char) -> Int
+
+pub fn pack_field(Byte, Int, Int, Int) -> Byte
+
+pub fn parity_bit(Byte) -> Int
+
+pub fn set_bit(Byte, Int, Bool) -> Byte
+
+pub fn verify_checksum_sum8(Array[Byte], Byte) -> Bool
+
+// Errors
+
+// Types and methods
+pub struct ByteBuffer {
+  mut data : Array[Byte]
+  mut read_pos : Int
+  mut write_pos : Int
+} derive(@debug.Debug)
+pub fn ByteBuffer::capacity(Self) -> Int
+pub fn ByteBuffer::clear(Self) -> Unit
+pub fn ByteBuffer::from_bytes(Array[Byte]) -> Self
+pub fn ByteBuffer::length(Self) -> Int
+pub fn ByteBuffer::new(Int) -> Self
+pub fn ByteBuffer::read_bytes(Self, Int) -> Result[Array[Byte], String]
+pub fn ByteBuffer::read_float32_le(Self) -> Result[Double, String]
+pub fn ByteBuffer::read_int32_le(Self) -> Result[Int, String]
+pub fn ByteBuffer::read_int8(Self) -> Result[Int, String]
+pub fn ByteBuffer::read_uint16_le(Self) -> Result[Int, String]
+pub fn ByteBuffer::read_uint24_le(Self) -> Result[Int, String]
+pub fn ByteBuffer::read_uint32_le(Self) -> Result[Int64, String]
+pub fn ByteBuffer::read_uint8(Self) -> Result[Byte, String]
+pub fn ByteBuffer::to_array(Self) -> Array[Byte]
+pub fn ByteBuffer::to_hex_string(Self) -> String
+pub fn ByteBuffer::write_bytes(Self, Array[Byte]) -> Unit
+pub fn ByteBuffer::write_float32_le(Self, Double) -> Unit
+pub fn ByteBuffer::write_int32_le(Self, Int) -> Unit
+pub fn ByteBuffer::write_int8(Self, Int) -> Unit
+pub fn ByteBuffer::write_uint16_be(Self, Int) -> Unit
+pub fn ByteBuffer::write_uint16_le(Self, Int) -> Unit
+pub fn ByteBuffer::write_uint24_le(Self, Int) -> Unit
+pub fn ByteBuffer::write_uint32_le(Self, Int64) -> Unit
+pub fn ByteBuffer::write_uint8(Self, Byte) -> Unit
+
+// Type aliases
+
+// Traits
+
