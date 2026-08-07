@@ -1,0 +1,71 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/state_machine"
+
+import {
+  "dgmlbtttt/iec104/src/apdu",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub enum ConnectionEvent {
+  EventConnected
+  EventDisconnected
+  EventStartDTAct
+  EventStartDTCon
+  EventStopDTAct
+  EventStopDTCon
+  EventFrameReceived(@apdu.APDU)
+  EventTimeoutT1
+  EventTimeoutT2
+  EventTimeoutT3
+} derive(Eq, @debug.Debug)
+pub fn ConnectionEvent::connected() -> Self
+pub fn ConnectionEvent::disconnected() -> Self
+pub fn ConnectionEvent::frame_received(@apdu.APDU) -> Self
+pub fn ConnectionEvent::start_dt_act() -> Self
+pub fn ConnectionEvent::start_dt_con() -> Self
+pub fn ConnectionEvent::stop_dt_act() -> Self
+pub fn ConnectionEvent::stop_dt_con() -> Self
+pub fn ConnectionEvent::timeout_t1() -> Self
+pub fn ConnectionEvent::timeout_t2() -> Self
+pub fn ConnectionEvent::timeout_t3() -> Self
+
+pub struct ConnectionState {
+  mut status : LinkStatus
+  sequence_mgr : @apdu.SequenceManager
+  is_master : Bool
+  mut last_activity_time : Int64
+} derive(Eq, @debug.Debug)
+pub fn ConnectionState::is_active(Self) -> Bool
+pub fn ConnectionState::last_activity_time(Self) -> Int64
+pub fn ConnectionState::new(is_master~ : Bool) -> Self
+pub fn ConnectionState::process_event(Self, ConnectionEvent) -> Result[Array[@apdu.APDU], String]
+pub fn ConnectionState::send_i_frame(Self, Array[Byte]) -> Result[@apdu.APDU, String]
+pub fn ConnectionState::sequence_mgr(Self) -> @apdu.SequenceManager
+pub fn ConnectionState::status(Self) -> LinkStatus
+pub fn ConnectionState::update_activity_time(Self, Int64) -> Unit
+
+pub enum LinkStatus {
+  Unconnected
+  Connecting
+  Stopped
+  PendingActive
+  Active
+  PendingStop
+} derive(Eq, @debug.Debug)
+pub fn LinkStatus::active() -> Self
+pub fn LinkStatus::connecting() -> Self
+pub fn LinkStatus::pending_active() -> Self
+pub fn LinkStatus::pending_stop() -> Self
+pub fn LinkStatus::stopped() -> Self
+pub fn LinkStatus::to_string(Self) -> String
+pub fn LinkStatus::unconnected() -> Self
+
+// Type aliases
+
+// Traits
+
