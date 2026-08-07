@@ -1,0 +1,53 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/timer"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct ProtocolTimerManager {
+  config : TimerConfig
+  mut t1_elapsed_ms : Int
+  mut t2_elapsed_ms : Int
+  mut t3_elapsed_ms : Int
+  mut t1_active : Bool
+  mut t2_active : Bool
+  mut t3_active : Bool
+} derive(Eq, @debug.Debug)
+pub fn ProtocolTimerManager::new(config? : TimerConfig) -> Self
+pub fn ProtocolTimerManager::reset_t3(Self) -> Unit
+pub fn ProtocolTimerManager::start_t1(Self) -> Unit
+pub fn ProtocolTimerManager::start_t2(Self) -> Unit
+pub fn ProtocolTimerManager::stop_t1(Self) -> Unit
+pub fn ProtocolTimerManager::stop_t2(Self) -> Unit
+pub fn ProtocolTimerManager::tick(Self, Int) -> Array[TimerExpired]
+
+pub struct TimerConfig {
+  t1_seconds : Int
+  t2_seconds : Int
+  t3_seconds : Int
+} derive(Eq, @debug.Debug)
+pub fn TimerConfig::create(t1? : Int, t2? : Int, t3? : Int) -> Self
+pub fn TimerConfig::default() -> Self
+pub fn TimerConfig::t1_seconds(Self) -> Int
+pub fn TimerConfig::t2_seconds(Self) -> Int
+pub fn TimerConfig::t3_seconds(Self) -> Int
+
+pub enum TimerExpired {
+  ExpiredT1
+  ExpiredT2
+  ExpiredT3
+} derive(Eq, @debug.Debug)
+pub fn TimerExpired::expired_t1() -> Self
+pub fn TimerExpired::expired_t2() -> Self
+pub fn TimerExpired::expired_t3() -> Self
+
+// Type aliases
+
+// Traits
+
