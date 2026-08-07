@@ -1,5 +1,9 @@
-// import {
-//   "dgmlbtttt/iec104" @lib,
-// }
-
 pkgtype(kind: "executable")
+
+import {
+  "dgmlbtttt/iec104/src/apdu",
+  "dgmlbtttt/iec104/src/master",
+  "dgmlbtttt/iec104/src/simulation",
+  "dgmlbtttt/iec104/src/slave",
+  "dgmlbtttt/iec104/src/state_machine",
+}
