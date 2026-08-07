@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup MoonBit Toolchain
+        uses: moonbitlang/setup-moonbit-action@v1
+
+      - name: Check Code Formatting & Warnings
+        run: |
+          moon version
+          moon fmt --check
+          moon check --deny-warn
+          moon info
+
+      - name: Execute Unit Test Suite
+        run: moon test --deny-warn
+
+      - name: Execute CLI Demonstration
+        run: moon run cmd/main
