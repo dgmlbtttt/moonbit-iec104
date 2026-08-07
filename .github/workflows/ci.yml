@@ -19,37 +19,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup MoonBit Toolchain (Linux / macOS)
-        if: runner.os != 'Windows'
-        run: |
-          wget -qO- https://cli.moonbitlang.com/install/bash.sh | bash || curl -sL https://cli.moonbitlang.com/install/bash.sh | bash
-          echo "$HOME/.moon/bin" >> $GITHUB_PATH
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Setup MoonBit Toolchain (Windows)
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
-          echo "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+      - name: Setup MoonBit Toolchain
+        uses: chaitanyapotti/setup-moonbit@v1
 
       - name: Check Code Formatting & Warnings
-        shell: bash
         run: |
-          export PATH="$HOME/.moon/bin:$HOME/.local/bin:$USERPROFILE/.moon/bin:$PATH"
           moon version
           moon fmt --check
           moon check --deny-warn
           moon info
 
       - name: Execute Unit Test Suite
-        shell: bash
-        run: |
-          export PATH="$HOME/.moon/bin:$HOME/.local/bin:$USERPROFILE/.moon/bin:$PATH"
-          moon test --deny-warn
+        run: moon test --deny-warn
 
       - name: Execute CLI Demonstration
-        shell: bash
-        run: |
-          export PATH="$HOME/.moon/bin:$HOME/.local/bin:$USERPROFILE/.moon/bin:$PATH"
-          moon run cmd/main
+        run: moon run cmd/main
