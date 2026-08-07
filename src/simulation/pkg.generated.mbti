@@ -1,0 +1,70 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/simulation"
+
+import {
+  "dgmlbtttt/iec104/src/apdu",
+  "dgmlbtttt/iec104/src/slave",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct SubstationBay {
+  bay_id : String
+  breaker_ioa : Int
+  disconnector_ioa : Int
+  voltage_ioa : Int
+  current_ioa : Int
+  power_ioa : Int
+  freq_ioa : Int
+  mut breaker_state : Bool
+  disconnector_state : Bool
+  base_voltage_kv : Double
+  mut current_a : Double
+  mut active_power_mw : Double
+  mut frequency_hz : Double
+  mut is_faulted : Bool
+} derive(Eq, @debug.Debug)
+pub fn SubstationBay::active_power_mw(Self) -> Double
+pub fn SubstationBay::base_voltage_kv(Self) -> Double
+pub fn SubstationBay::bay_id(Self) -> String
+pub fn SubstationBay::breaker_ioa(Self) -> Int
+pub fn SubstationBay::breaker_state(Self) -> Bool
+pub fn SubstationBay::clear_fault(Self) -> Unit
+pub fn SubstationBay::create(bay_id~ : String, breaker_ioa~ : Int, disconnector_ioa~ : Int, voltage_ioa~ : Int, current_ioa~ : Int, power_ioa~ : Int, freq_ioa~ : Int, base_voltage_kv? : Double) -> Self
+pub fn SubstationBay::current_a(Self) -> Double
+pub fn SubstationBay::current_ioa(Self) -> Int
+pub fn SubstationBay::disconnector_ioa(Self) -> Int
+pub fn SubstationBay::disconnector_state(Self) -> Bool
+pub fn SubstationBay::freq_ioa(Self) -> Int
+pub fn SubstationBay::frequency_hz(Self) -> Double
+pub fn SubstationBay::inject_overcurrent_fault(Self) -> Unit
+pub fn SubstationBay::is_faulted(Self) -> Bool
+pub fn SubstationBay::power_ioa(Self) -> Int
+pub fn SubstationBay::set_breaker_state(Self, Bool) -> Unit
+pub fn SubstationBay::step_simulation(Self, Int64) -> Unit
+pub fn SubstationBay::voltage_ioa(Self) -> Int
+
+pub struct SubstationModel {
+  station_name : String
+  bays : Array[SubstationBay]
+  slave_node : @slave.SlaveNode
+  mut total_sim_time_ms : Int64
+  mut generated_events_count : Int
+} derive(Eq, @debug.Debug)
+pub fn SubstationModel::activate_connection(Self) -> Unit
+pub fn SubstationModel::bays(Self) -> Array[SubstationBay]
+pub fn SubstationModel::create(station_name? : String, casdu_addr? : Int) -> Self
+pub fn SubstationModel::generated_events_count(Self) -> Int
+pub fn SubstationModel::slave_node(Self) -> @slave.SlaveNode
+pub fn SubstationModel::station_name(Self) -> String
+pub fn SubstationModel::step(Self, Int) -> Array[@apdu.APDU]
+pub fn SubstationModel::trigger_bay_fault(Self, Int) -> Array[@apdu.APDU]
+
+// Type aliases
+
+// Traits
+
