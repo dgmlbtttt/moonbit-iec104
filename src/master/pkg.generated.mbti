@@ -1,0 +1,35 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/master"
+
+import {
+  "dgmlbtttt/iec104/src/apdu",
+  "dgmlbtttt/iec104/src/state_machine",
+  "dgmlbtttt/iec104/src/types",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct MasterNode {
+  target_casdu : @types.CASDU
+  conn : @state_machine.ConnectionState
+  received_telemetry : Map[Int, Double]
+  received_telesignals : Map[Int, Bool]
+} derive(Eq, @debug.Debug)
+pub fn MasterNode::conn(Self) -> @state_machine.ConnectionState
+pub fn MasterNode::handle_apdu(Self, @apdu.APDU) -> Result[Unit, String]
+pub fn MasterNode::initiate_general_interrogation(Self) -> Result[@apdu.APDU, String]
+pub fn MasterNode::new(Int) -> Self
+pub fn MasterNode::received_telemetry(Self) -> Map[Int, Double]
+pub fn MasterNode::received_telesignals(Self) -> Map[Int, Bool]
+pub fn MasterNode::send_clock_sync(Self, @types.CP56Time2a) -> Result[@apdu.APDU, String]
+pub fn MasterNode::send_single_command(Self, Int, Bool, Bool) -> Result[@apdu.APDU, String]
+pub fn MasterNode::target_casdu(Self) -> @types.CASDU
+
+// Type aliases
+
+// Traits
+
