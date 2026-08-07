@@ -43,6 +43,44 @@ pub fn ASDUHeader::positive_ack(Self) -> Bool
 pub fn ASDUHeader::sq(Self) -> Bool
 pub fn ASDUHeader::type_id(Self) -> Byte
 
+pub struct FaultWaveformBuffer {
+  record_id : Int
+  sampling_rate_hz : Int
+  voltage_samples : Array[Double]
+  current_samples : Array[Double]
+} derive(Eq, @debug.Debug)
+pub fn FaultWaveformBuffer::add_sample(Self, Double, Double) -> Unit
+pub fn FaultWaveformBuffer::new(Int, Int) -> Self
+pub fn FaultWaveformBuffer::samples_count(Self) -> Int
+pub fn FaultWaveformBuffer::to_bytes(Self) -> Array[Byte]
+
+pub struct FileDescriptor {
+  filename_id : Int
+  file_size_bytes : Int
+  is_directory : Bool
+  timestamp : @types.CP56Time2a
+} derive(Eq, @debug.Debug)
+pub fn FileDescriptor::create(filename_id~ : Int, file_size_bytes~ : Int, is_directory? : Bool, timestamp? : @types.CP56Time2a) -> Self
+pub fn FileDescriptor::file_size_bytes(Self) -> Int
+pub fn FileDescriptor::filename_id(Self) -> Int
+pub fn FileDescriptor::is_directory(Self) -> Bool
+pub fn FileDescriptor::timestamp(Self) -> @types.CP56Time2a
+
+pub struct FileSegment {
+  filename_id : Int
+  section_number : Int
+  segment_offset : Int
+  data : Array[Byte]
+  checksum : Byte
+} derive(Eq, @debug.Debug)
+pub fn FileSegment::checksum(Self) -> Byte
+pub fn FileSegment::create(filename_id~ : Int, section_number~ : Int, segment_offset~ : Int, data~ : Array[Byte]) -> Self
+pub fn FileSegment::data(Self) -> Array[Byte]
+pub fn FileSegment::filename_id(Self) -> Int
+pub fn FileSegment::section_number(Self) -> Int
+pub fn FileSegment::segment_offset(Self) -> Int
+pub fn FileSegment::verify_checksum(Self) -> Bool
+
 pub enum InformationElement {
   SinglePointElem(@types.IOA, @types.SIQ, @types.CP24Time2a?, @types.CP56Time2a?)
   DoublePointElem(@types.IOA, @types.DIQ, @types.CP24Time2a?, @types.CP56Time2a?)

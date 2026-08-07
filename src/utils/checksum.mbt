@@ -21,6 +21,15 @@ pub fn calculate_xor8(data : Array[Byte], start : Int, length : Int) -> Byte {
 }
 
 ///|
+pub fn calculate_lrc(data : Array[Byte]) -> Byte {
+  let mut sum = 0
+  for i = 0; i < data.length(); i = i + 1 {
+    sum = (sum + data[i].to_int()) & 0xFF
+  }
+  ((sum ^ 0xFF) + 1).to_byte()
+}
+
+///|
 pub fn calculate_crc16_modbus(
   data : Array[Byte],
   start : Int,

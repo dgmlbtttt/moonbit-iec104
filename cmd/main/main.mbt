@@ -49,7 +49,40 @@ fn main {
   }
   println("[GI] Master General Interrogation completed successfully.")
 
-  // 4. Simulate Grid Telemetry Load Fluctuation
+  // 4. Microgrid Solar PV & Battery BESS Simulation
+  println(
+    "\n[MICROGRID] Simulating Microgrid Solar PV & Battery Energy Storage (BESS)...",
+  )
+  let pv = @simulation.SolarPVInverter::create(
+    inverter_id="PV-110kV-01",
+    voltage_ioa=5001,
+    current_ioa=5002,
+    power_ioa=5003,
+    status_ioa=5004,
+    capacity_kw=1000.0,
+  )
+  let bess = @simulation.BatteryBESS::create(
+    bess_id="BESS-110kV-01",
+    soc_ioa=6001,
+    power_ioa=6002,
+    status_ioa=6003,
+    capacity_kwh=2000.0,
+    max_power_kw=1000.0,
+  )
+  bess.set_mode(@simulation.BESSMode::discharging(), 500.0)
+
+  println(
+    "  [PV] Active Power Output: " + pv.active_power_kw().to_string() + " kW",
+  )
+  println(
+    "  [BESS] Mode: DISCHARGING | SOC: " +
+    bess.soc_percent().to_string() +
+    "% | Power: " +
+    bess.current_power_kw().to_string() +
+    " kW",
+  )
+
+  // 5. Simulate Grid Telemetry Load Fluctuation
   println("\n[SIM] Simulating 5 seconds of grid load fluctuation...")
   for t = 1; t <= 5; t = t + 1 {
     let _ = sub.step(1000)
@@ -67,8 +100,19 @@ fn main {
     )
   }
 
-  // 5. Fault Injection: Overcurrent trip on Feeder-1
+  // 6. IDMT Overcurrent Protection & Fault Injection
   println("\n[FAULT] Injecting overcurrent fault (1.25 kA) on Feeder-1...")
+  let relay = @simulation.IDMTProtectionRelay::create(
+    pickup_current_a=200.0,
+    time_multiplier=0.5,
+  )
+  let trip_time = relay.calculate_trip_time_sec(1250.0)
+  println(
+    "[IDMT] Relay Protection Curve: Standard Inverse (IEC 60255) | Calculated Trip Time: " +
+    trip_time.to_string() +
+    " s",
+  )
+
   let fault_apdus = sub.trigger_bay_fault(1)
   println(
     "[FAULT] Protection relay tripped breaker! Spontaneous IEC 104 ASDUs generated: " +
@@ -82,7 +126,7 @@ fn main {
     "[MASTER] Master received spontaneous fault alarm. Breaker IOA 1003 state: OPEN",
   )
 
-  // 6. Master Issues Remote Single Command (Select & Execute) to Close Breaker
+  // 7. Master Issues Remote Single Command (Select & Execute) to Close Breaker
   println(
     "\n[CMD] Control Center issuing Remote Close Command to Breaker 1003...",
   )
@@ -100,7 +144,7 @@ fn main {
     "[SYS] Feeder-1 breaker state restored: CLOSED. Grid power re-established!",
   )
 
-  // 7. Benchmark performance check
+  // 8. Benchmark performance check
   println(
     "\n[BENCH] Running APCI & ASDU Encoder/Decoder Throughput Benchmark...",
   )

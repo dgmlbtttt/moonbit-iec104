@@ -12,6 +12,93 @@ import {
 // Errors
 
 // Types and methods
+pub enum BESSMode {
+  BESSIdle
+  BESSCharging
+  BESSDischarging
+} derive(Eq, @debug.Debug)
+pub fn BESSMode::charging() -> Self
+pub fn BESSMode::discharging() -> Self
+pub fn BESSMode::idle() -> Self
+
+pub struct BatteryBESS {
+  bess_id : String
+  soc_ioa : Int
+  power_ioa : Int
+  status_ioa : Int
+  capacity_kwh : Double
+  max_power_kw : Double
+  mut soc_percent : Double
+  mut current_power_kw : Double
+  mut mode : BESSMode
+  mut cell_temp_c : Double
+} derive(Eq, @debug.Debug)
+pub fn BatteryBESS::bess_id(Self) -> String
+pub fn BatteryBESS::cell_temp_c(Self) -> Double
+pub fn BatteryBESS::create(bess_id~ : String, soc_ioa~ : Int, power_ioa~ : Int, status_ioa~ : Int, capacity_kwh? : Double, max_power_kw? : Double) -> Self
+pub fn BatteryBESS::current_power_kw(Self) -> Double
+pub fn BatteryBESS::mode(Self) -> BESSMode
+pub fn BatteryBESS::power_ioa(Self) -> Int
+pub fn BatteryBESS::set_mode(Self, BESSMode, Double) -> Unit
+pub fn BatteryBESS::soc_ioa(Self) -> Int
+pub fn BatteryBESS::soc_percent(Self) -> Double
+pub fn BatteryBESS::status_ioa(Self) -> Int
+pub fn BatteryBESS::step_simulation(Self, Int) -> Unit
+
+pub struct IDMTProtectionRelay {
+  pickup_current_a : Double
+  time_multiplier : Double
+  curve_type : RelayCurveType
+  mut accumulated_trip_ms : Double
+  mut is_tripped : Bool
+} derive(Eq, @debug.Debug)
+pub fn IDMTProtectionRelay::calculate_trip_time_sec(Self, Double) -> Double
+pub fn IDMTProtectionRelay::check_fault(Self, Double, Int) -> Bool
+pub fn IDMTProtectionRelay::create(pickup_current_a? : Double, time_multiplier? : Double, curve_type? : RelayCurveType) -> Self
+pub fn IDMTProtectionRelay::curve_type(Self) -> RelayCurveType
+pub fn IDMTProtectionRelay::is_tripped(Self) -> Bool
+pub fn IDMTProtectionRelay::pickup_current_a(Self) -> Double
+pub fn IDMTProtectionRelay::reset(Self) -> Unit
+pub fn IDMTProtectionRelay::time_multiplier(Self) -> Double
+
+pub enum RelayCurveType {
+  StandardInverse
+  VeryInverse
+  ExtremelyInverse
+} derive(Eq, @debug.Debug)
+pub fn RelayCurveType::extremely_inverse() -> Self
+pub fn RelayCurveType::standard_inverse() -> Self
+pub fn RelayCurveType::very_inverse() -> Self
+
+pub struct SolarPVInverter {
+  inverter_id : String
+  voltage_ioa : Int
+  current_ioa : Int
+  power_ioa : Int
+  status_ioa : Int
+  capacity_kw : Double
+  mut irradiance_w_m2 : Double
+  mut active_power_kw : Double
+  mut reactive_power_kvar : Double
+  mut is_connected : Bool
+  mut inverter_temp_c : Double
+} derive(Eq, @debug.Debug)
+pub fn SolarPVInverter::active_power_kw(Self) -> Double
+pub fn SolarPVInverter::capacity_kw(Self) -> Double
+pub fn SolarPVInverter::create(inverter_id~ : String, voltage_ioa~ : Int, current_ioa~ : Int, power_ioa~ : Int, status_ioa~ : Int, capacity_kw? : Double) -> Self
+pub fn SolarPVInverter::current_ioa(Self) -> Int
+pub fn SolarPVInverter::inverter_id(Self) -> String
+pub fn SolarPVInverter::inverter_temp_c(Self) -> Double
+pub fn SolarPVInverter::is_connected(Self) -> Bool
+pub fn SolarPVInverter::power_ioa(Self) -> Int
+pub fn SolarPVInverter::reactive_power_kvar(Self) -> Double
+pub fn SolarPVInverter::reset_inverter(Self) -> Unit
+pub fn SolarPVInverter::set_irradiance(Self, Double) -> Unit
+pub fn SolarPVInverter::status_ioa(Self) -> Int
+pub fn SolarPVInverter::step_simulation(Self, Int64) -> Unit
+pub fn SolarPVInverter::trip_inverter(Self) -> Unit
+pub fn SolarPVInverter::voltage_ioa(Self) -> Int
+
 pub struct SubstationBay {
   bay_id : String
   breaker_ioa : Int

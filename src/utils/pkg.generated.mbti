@@ -14,6 +14,8 @@ pub fn bytes_to_hex_string(Array[Byte]) -> String
 
 pub fn calculate_crc16_modbus(Array[Byte], Int, Int) -> Int
 
+pub fn calculate_lrc(Array[Byte]) -> Byte
+
 pub fn calculate_sum8(Array[Byte], Int, Int) -> Byte
 
 pub fn calculate_xor8(Array[Byte], Int, Int) -> Byte
