@@ -1,0 +1,84 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "dgmlbtttt/iec104/src/asdu"
+
+import {
+  "dgmlbtttt/iec104/src/types",
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+
+// Types and methods
+pub struct ASDU {
+  header : ASDUHeader
+  elements : Array[InformationElement]
+} derive(Eq, @debug.Debug)
+pub fn ASDU::create(ASDUHeader, Array[InformationElement]) -> Self
+pub fn ASDU::decode(Array[Byte]) -> Result[Self, String]
+pub fn ASDU::elements(Self) -> Array[InformationElement]
+pub fn ASDU::encode(Self) -> Array[Byte]
+pub fn ASDU::header(Self) -> ASDUHeader
+
+pub struct ASDUHeader {
+  type_id : Byte
+  sq : Bool
+  num_objects : Int
+  cot : Int
+  is_test : Bool
+  positive_ack : Bool
+  oa : Int
+  casdu : @types.CASDU
+} derive(Eq, @debug.Debug)
+pub fn ASDUHeader::casdu(Self) -> @types.CASDU
+pub fn ASDUHeader::cot(Self) -> Int
+pub fn ASDUHeader::create(type_id~ : Byte, sq? : Bool, num_objects? : Int, cot~ : Int, is_test? : Bool, positive_ack? : Bool, oa? : Int, casdu~ : @types.CASDU) -> Self
+pub fn ASDUHeader::decode(Array[Byte]) -> Result[Self, String]
+pub fn ASDUHeader::encode(Self) -> Array[Byte]
+pub fn ASDUHeader::is_test(Self) -> Bool
+pub fn ASDUHeader::num_objects(Self) -> Int
+pub fn ASDUHeader::oa(Self) -> Int
+pub fn ASDUHeader::positive_ack(Self) -> Bool
+pub fn ASDUHeader::sq(Self) -> Bool
+pub fn ASDUHeader::type_id(Self) -> Byte
+
+pub enum InformationElement {
+  SinglePointElem(@types.IOA, @types.SIQ, @types.CP24Time2a?, @types.CP56Time2a?)
+  DoublePointElem(@types.IOA, @types.DIQ, @types.CP24Time2a?, @types.CP56Time2a?)
+  StepPositionElem(@types.IOA, Int, @types.QDS, @types.CP56Time2a?)
+  NormalizedTelemetryElem(@types.IOA, Int, @types.QDS, @types.CP24Time2a?, @types.CP56Time2a?)
+  ScaledTelemetryElem(@types.IOA, Int, @types.QDS, @types.CP24Time2a?, @types.CP56Time2a?)
+  ShortFloatTelemetryElem(@types.IOA, Double, @types.QDS, @types.CP24Time2a?, @types.CP56Time2a?)
+  IntegratedTotalsElem(@types.IOA, Int64, Int, Bool, Bool, Bool, @types.CP56Time2a?)
+  SingleCommandElem(@types.IOA, @types.CommandQualifier)
+  DoubleCommandElem(@types.IOA, @types.CommandQualifier)
+  SetPointNormalizedElem(@types.IOA, Int, @types.CommandQualifier)
+  SetPointScaledElem(@types.IOA, Int, @types.CommandQualifier)
+  SetPointFloatElem(@types.IOA, Double, @types.CommandQualifier)
+  InterrogationCommandElem(@types.IOA, Byte)
+  CounterInterrogationElem(@types.IOA, Byte)
+  ClockSyncElem(@types.IOA, @types.CP56Time2a)
+  ResetProcessElem(@types.IOA, Byte)
+} derive(Eq, @debug.Debug)
+pub fn InformationElement::clock_sync(@types.IOA, @types.CP56Time2a) -> Self
+pub fn InformationElement::counter_interrogation(@types.IOA, Byte) -> Self
+pub fn InformationElement::double_command(@types.IOA, @types.CommandQualifier) -> Self
+pub fn InformationElement::double_point(@types.IOA, @types.DIQ, time24? : @types.CP24Time2a?, time56? : @types.CP56Time2a?) -> Self
+pub fn InformationElement::integrated_totals(@types.IOA, Int64, Int, Bool, Bool, Bool, time56? : @types.CP56Time2a?) -> Self
+pub fn InformationElement::interrogation_command(@types.IOA, Byte) -> Self
+pub fn InformationElement::normalized_telemetry(@types.IOA, Int, @types.QDS, time24? : @types.CP24Time2a?, time56? : @types.CP56Time2a?) -> Self
+pub fn InformationElement::reset_process(@types.IOA, Byte) -> Self
+pub fn InformationElement::scaled_telemetry(@types.IOA, Int, @types.QDS, time24? : @types.CP24Time2a?, time56? : @types.CP56Time2a?) -> Self
+pub fn InformationElement::set_point_float(@types.IOA, Double, @types.CommandQualifier) -> Self
+pub fn InformationElement::set_point_normalized(@types.IOA, Int, @types.CommandQualifier) -> Self
+pub fn InformationElement::set_point_scaled(@types.IOA, Int, @types.CommandQualifier) -> Self
+pub fn InformationElement::short_float_telemetry(@types.IOA, Double, @types.QDS, time24? : @types.CP24Time2a?, time56? : @types.CP56Time2a?) -> Self
+pub fn InformationElement::single_command(@types.IOA, @types.CommandQualifier) -> Self
+pub fn InformationElement::single_point(@types.IOA, @types.SIQ, time24? : @types.CP24Time2a?, time56? : @types.CP56Time2a?) -> Self
+pub fn InformationElement::step_position(@types.IOA, Int, @types.QDS, time56? : @types.CP56Time2a?) -> Self
+
+// Type aliases
+
+// Traits
+
