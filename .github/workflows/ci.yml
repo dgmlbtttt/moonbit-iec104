@@ -22,23 +22,21 @@ jobs:
       - name: Setup MoonBit Toolchain (Linux / macOS)
         if: runner.os != 'Windows'
         run: |
-          curl -fsSL -A "Mozilla/5.0 (X11; Linux x86_64)" https://cli.moonbitlang.com/install/bash.sh | bash
+          wget -qO- https://cli.moonbitlang.com/install/bash.sh | bash || curl -sL https://cli.moonbitlang.com/install/bash.sh | bash
           echo "$HOME/.moon/bin" >> $GITHUB_PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Setup MoonBit Toolchain (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          $client = New-Object System.Net.WebClient
-          $client.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-          $code = $client.DownloadString("https://cli.moonbitlang.com/install/powershell.ps1")
-          Invoke-Expression $code
+          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
           echo "$env:USERPROFILE\.moon\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: Check Code Formatting & Warnings
         shell: bash
         run: |
-          export PATH="$HOME/.moon/bin:$USERPROFILE/.moon/bin:$PATH"
+          export PATH="$HOME/.moon/bin:$HOME/.local/bin:$USERPROFILE/.moon/bin:$PATH"
           moon version
           moon fmt --check
           moon check --deny-warn
@@ -47,11 +45,11 @@ jobs:
       - name: Execute Unit Test Suite
         shell: bash
         run: |
-          export PATH="$HOME/.moon/bin:$USERPROFILE/.moon/bin:$PATH"
+          export PATH="$HOME/.moon/bin:$HOME/.local/bin:$USERPROFILE/.moon/bin:$PATH"
           moon test --deny-warn
 
       - name: Execute CLI Demonstration
         shell: bash
         run: |
-          export PATH="$HOME/.moon/bin:$USERPROFILE/.moon/bin:$PATH"
+          export PATH="$HOME/.moon/bin:$HOME/.local/bin:$USERPROFILE/.moon/bin:$PATH"
           moon run cmd/main
