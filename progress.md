@@ -10,3 +10,4 @@
 - Expanded the repository to 110 `.mbt` files and 8,381 actual MoonBit source lines; the test suite now has 93 passing tests.
 - Added a measured APCI benchmark to the CLI, refreshed the README and module metadata, and added stable-toolchain CI plus a manual Mooncakes publish workflow.
 - Final local checks passed: `moon fmt --check`, `moon info`, `moon check --deny-warn --target all`, default tests, and `wasm-gc` tests. Native Windows execution is isolated because the local runtime C library lacks `rand_s`.
+- Pushed commit `ccdb99b` to GitHub `main`; `moon publish` completed with server status 200 OK for `dgmlbtttt/iec104` version `0.2.0`.

@@ -8,7 +8,7 @@
 - [x] 主站子站事件闭环与测试
 - [x] 场景驱动、真实基准与 CLI
 - [x] README、CI、元数据、发布 workflow
-- [ ] 全量验证、自查、提交、推送、Mooncakes 发布
+- [x] 全量验证、自查、提交、推送、Mooncakes 发布
 
 ## 约束
 
