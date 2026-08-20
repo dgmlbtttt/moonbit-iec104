@@ -44,6 +44,14 @@ pub const COT_UNKNOWN_TYPE_ID : Int = 44
 
 pub const MAX_APDU_LEN : Int = 255
 
+pub const MAX_CASDU : Int = 0xFFFF
+
+pub const MAX_INFORMATION_OBJECTS : Int = 127
+
+pub const MAX_IOA : Int = 0xFFFFFF
+
+pub const MAX_SEQUENCE : Int = 32767
+
 pub const MIN_APDU_LEN : Int = 6
 
 pub const QCC_GENERAL_RESET : Byte = b'\x05'
@@ -120,6 +128,44 @@ pub const TYPE_M_ST_TA_1 : Byte = b'\x06'
 
 pub const TYPE_M_ST_TB_1 : Byte = b'\x20'
 
+pub fn command_is_select(CommandQualifier) -> Bool
+
+pub fn command_pulse_is_valid(CommandQualifier) -> Bool
+
+pub fn days_in_month(Int, Int) -> Int
+
+pub fn describe_type(Byte) -> Result[TypeDescriptor, String]
+
+pub fn double_point_is_valid(DIQ) -> Bool
+
+pub fn is_leap_year(Int) -> Bool
+
+pub fn normalize_quality_byte(Byte) -> Byte
+
+pub fn quality_byte_has_reserved_bits(Byte) -> Bool
+
+pub fn quality_is_usable(QDS) -> Bool
+
+pub fn signal_is_usable(SIQ) -> Bool
+
+pub fn validate_calendar_date(Int, Int, Int) -> Result[Unit, String]
+
+pub fn validate_casdu_value(Int) -> Result[Unit, String]
+
+pub fn validate_cause_of_transmission(Int) -> Result[Unit, String]
+
+pub fn validate_frame_window(Int, Int) -> ValidationReport
+
+pub fn validate_ioa_value(Int) -> Result[Unit, String]
+
+pub fn validate_object_count_value(Int) -> Result[Unit, String]
+
+pub fn validate_protocol_addresses(Int, Int) -> ValidationReport
+
+pub fn validate_quality_for_measurement(QDS, Double) -> Result[Unit, String]
+
+pub fn validate_sequence(Int) -> Result[Unit, String]
+
 // Errors
 
 // Types and methods
@@ -131,6 +177,8 @@ pub fn CASDU::from_bytes(Array[Byte]) -> Result[Self, String]
 pub fn CASDU::is_broadcast(Self) -> Bool
 pub fn CASDU::new(Int) -> Self
 pub fn CASDU::to_bytes(Self) -> Array[Byte]
+pub fn CASDU::try_new(Int) -> Result[Self, String]
+pub fn CASDU::validate(Self) -> Result[Unit, String]
 
 pub struct CP24Time2a {
   milliseconds : Int
@@ -138,8 +186,10 @@ pub struct CP24Time2a {
   invalid : Bool
 } derive(Eq, @debug.Debug)
 pub fn CP24Time2a::create(milliseconds? : Int, minutes? : Int, invalid? : Bool) -> Self
+pub fn CP24Time2a::encode_checked(Self) -> Result[Array[Byte], String]
 pub fn CP24Time2a::from_bytes(Array[Byte]) -> Result[Self, String]
 pub fn CP24Time2a::to_bytes(Self) -> Array[Byte]
+pub fn CP24Time2a::validate(Self) -> Result[Unit, String]
 
 pub struct CP56Time2a {
   milliseconds : Int
@@ -156,6 +206,7 @@ pub fn CP56Time2a::create(milliseconds? : Int, minutes? : Int, invalid? : Bool, 
 pub fn CP56Time2a::day_of_month(Self) -> Int
 pub fn CP56Time2a::day_of_week(Self) -> Int
 pub fn CP56Time2a::default() -> Self
+pub fn CP56Time2a::encode_checked(Self) -> Result[Array[Byte], String]
 pub fn CP56Time2a::from_bytes(Array[Byte]) -> Result[Self, String]
 pub fn CP56Time2a::hours(Self) -> Int
 pub fn CP56Time2a::milliseconds(Self) -> Int
@@ -163,6 +214,8 @@ pub fn CP56Time2a::minutes(Self) -> Int
 pub fn CP56Time2a::month(Self) -> Int
 pub fn CP56Time2a::to_bytes(Self) -> Array[Byte]
 pub fn CP56Time2a::to_string(Self) -> String
+pub fn CP56Time2a::validate(Self) -> Result[Unit, String]
+pub fn CP56Time2a::validate_calendar(Self) -> Result[Unit, String]
 pub fn CP56Time2a::year(Self) -> Int
 
 pub struct CommandQualifier {
@@ -171,11 +224,13 @@ pub struct CommandQualifier {
   pulse_duration : Int
 } derive(Eq, @debug.Debug)
 pub fn CommandQualifier::create(state? : Bool, select_execute? : Bool, pulse_duration? : Int) -> Self
+pub fn CommandQualifier::encode_checked(Self) -> Result[Byte, String]
 pub fn CommandQualifier::from_byte(Byte) -> Self
 pub fn CommandQualifier::pulse_duration(Self) -> Int
 pub fn CommandQualifier::select_execute(Self) -> Bool
 pub fn CommandQualifier::state(Self) -> Bool
 pub fn CommandQualifier::to_byte(Self) -> Byte
+pub fn CommandQualifier::validate(Self) -> Result[Unit, String]
 
 pub struct DIQ {
   dpi : Int
@@ -197,6 +252,8 @@ pub fn IOA::from_bytes(Array[Byte]) -> Result[Self, String]
 pub fn IOA::new(Int) -> Self
 pub fn IOA::to_bytes(Self) -> Array[Byte]
 pub fn IOA::to_string(Self) -> String
+pub fn IOA::try_new(Int) -> Result[Self, String]
+pub fn IOA::validate(Self) -> Result[Unit, String]
 pub fn IOA::value(Self) -> Int
 
 pub struct QDS {
@@ -229,7 +286,39 @@ pub fn SIQ::invalid(Self) -> Bool
 pub fn SIQ::to_byte(Self) -> Byte
 pub fn SIQ::value(Self) -> Bool
 
+pub struct TypeDescriptor {
+  type_id : Byte
+  name : String
+  value_width : Int
+  measurement : Bool
+  command : Bool
+  cp24_time : Bool
+  cp56_time : Bool
+} derive(Eq, @debug.Debug)
+pub fn TypeDescriptor::has_cp24_time(Self) -> Bool
+pub fn TypeDescriptor::has_cp56_time(Self) -> Bool
+pub fn TypeDescriptor::is_command(Self) -> Bool
+pub fn TypeDescriptor::is_measurement(Self) -> Bool
+pub fn TypeDescriptor::name(Self) -> String
+pub fn TypeDescriptor::type_id(Self) -> Byte
+pub fn TypeDescriptor::value_width(Self) -> Int
+
+pub struct ValidationIssue {
+  field : String
+  message : String
+} derive(Eq, @debug.Debug)
+pub fn ValidationIssue::field(Self) -> String
+pub fn ValidationIssue::message(Self) -> String
+
+pub struct ValidationReport {
+  issues : Array[ValidationIssue]
+} derive(Eq, @debug.Debug)
+pub fn ValidationReport::add(Self, String, String) -> Unit
+pub fn ValidationReport::is_valid(Self) -> Bool
+pub fn ValidationReport::issues(Self) -> Array[ValidationIssue]
+pub fn ValidationReport::merge(Self, Self) -> Unit
+pub fn ValidationReport::new() -> Self
+
 // Type aliases
 
 // Traits
-

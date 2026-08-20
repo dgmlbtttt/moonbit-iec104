@@ -75,7 +75,49 @@ pub fn ByteBuffer::write_uint24_le(Self, Int) -> Unit
 pub fn ByteBuffer::write_uint32_le(Self, Int64) -> Unit
 pub fn ByteBuffer::write_uint8(Self, Byte) -> Unit
 
+pub struct ByteReader {
+  bytes : Array[Byte]
+  mut offset : Int
+} derive(Eq, @debug.Debug)
+pub fn ByteReader::is_empty(Self) -> Bool
+pub fn ByteReader::new(Array[Byte]) -> Self
+pub fn ByteReader::peek_u8(Self) -> Result[Byte, String]
+pub fn ByteReader::position(Self) -> Int
+pub fn ByteReader::read_bytes(Self, Int) -> Result[Array[Byte], String]
+pub fn ByteReader::read_i8(Self) -> Result[Int, String]
+pub fn ByteReader::read_u16_le(Self) -> Result[Int, String]
+pub fn ByteReader::read_u24_le(Self) -> Result[Int, String]
+pub fn ByteReader::read_u8(Self) -> Result[Byte, String]
+pub fn ByteReader::remaining(Self) -> Int
+pub fn ByteReader::skip(Self, Int) -> Result[Unit, String]
+
+pub struct ByteRingBuffer {
+  capacity : Int
+  data : Array[Byte]
+  mut head : Int
+  mut count : Int
+} derive(Eq, @debug.Debug)
+pub fn ByteRingBuffer::capacity(Self) -> Int
+pub fn ByteRingBuffer::clear(Self) -> Unit
+pub fn ByteRingBuffer::is_full(Self) -> Bool
+pub fn ByteRingBuffer::len(Self) -> Int
+pub fn ByteRingBuffer::new(Int) -> Self
+pub fn ByteRingBuffer::pop(Self) -> Byte?
+pub fn ByteRingBuffer::push(Self, Byte) -> Bool
+pub fn ByteRingBuffer::to_array(Self) -> Array[Byte]
+
+pub struct RetryBudget {
+  limit : Int
+  mut attempts : Int
+} derive(Eq, @debug.Debug)
+pub fn RetryBudget::attempts(Self) -> Int
+pub fn RetryBudget::exhausted(Self) -> Bool
+pub fn RetryBudget::limit(Self) -> Int
+pub fn RetryBudget::new(Int) -> Self
+pub fn RetryBudget::remaining(Self) -> Int
+pub fn RetryBudget::reset(Self) -> Unit
+pub fn RetryBudget::take(Self) -> Bool
+
 // Type aliases
 
 // Traits
-

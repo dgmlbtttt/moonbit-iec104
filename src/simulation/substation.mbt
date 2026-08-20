@@ -163,3 +163,21 @@ pub fn SubstationModel::trigger_bay_fault(
   }
   spontaneous_apdus
 }
+
+///|
+pub fn SubstationModel::clear_bay_fault(
+  self : SubstationModel,
+  bay_index : Int,
+) -> Bool {
+  if bay_index < 0 || bay_index >= self.bays.length() {
+    return false
+  }
+  let bay = self.bays[bay_index]
+  bay.clear_fault()
+  self.slave_node.db().set_single_point(bay.breaker_ioa(), bay.breaker_state())
+  self.slave_node.db().set_telemetry_float(bay.current_ioa(), bay.current_a())
+  self.slave_node
+  .db()
+  .set_telemetry_float(bay.power_ioa(), bay.active_power_mw())
+  true
+}

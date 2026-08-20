@@ -14,6 +14,63 @@ import {
 // Errors
 
 // Types and methods
+pub struct AlarmLog {
+  capacity : Int
+  mut next_id : Int
+  mut records : Array[AlarmRecord]
+} derive(Eq, @debug.Debug)
+pub fn AlarmLog::acknowledge(Self, Int) -> Bool
+pub fn AlarmLog::len(Self) -> Int
+pub fn AlarmLog::new(Int) -> Self
+pub fn AlarmLog::record(Self, Int, AlarmSeverity, String, Int64) -> Result[Int, String]
+pub fn AlarmLog::records(Self) -> Array[AlarmRecord]
+pub fn AlarmLog::unacknowledged(Self) -> Array[AlarmRecord]
+
+pub struct AlarmRecord {
+  id : Int
+  ioa : Int
+  severity : AlarmSeverity
+  message : String
+  raised_at : Int64
+  mut acknowledged : Bool
+} derive(Eq, @debug.Debug)
+pub fn AlarmRecord::acknowledge(Self) -> Unit
+pub fn AlarmRecord::acknowledged(Self) -> Bool
+pub fn AlarmRecord::id(Self) -> Int
+pub fn AlarmRecord::ioa(Self) -> Int
+pub fn AlarmRecord::message(Self) -> String
+pub fn AlarmRecord::raised_at(Self) -> Int64
+pub fn AlarmRecord::severity(Self) -> AlarmSeverity
+
+pub enum AlarmSeverity {
+  Info
+  Warning
+  Critical
+} derive(Eq, @debug.Debug)
+pub fn AlarmSeverity::critical() -> Self
+pub fn AlarmSeverity::info() -> Self
+pub fn AlarmSeverity::warning() -> Self
+
+pub enum CommandDecision {
+  Selected
+  Executed
+} derive(Eq, @debug.Debug)
+
+pub struct EventQueue {
+  capacity : Int
+  mut next_sequence : Int
+  mut dropped : Int
+  mut events : Array[QueuedEvent]
+} derive(Eq, @debug.Debug)
+pub fn EventQueue::capacity(Self) -> Int
+pub fn EventQueue::drain(Self, Int) -> Array[QueuedEvent]
+pub fn EventQueue::dropped_count(Self) -> Int
+pub fn EventQueue::is_empty(Self) -> Bool
+pub fn EventQueue::len(Self) -> Int
+pub fn EventQueue::new(Int) -> Self
+pub fn EventQueue::pop(Self) -> QueuedEvent?
+pub fn EventQueue::push(Self, @asdu.ASDU) -> Bool
+
 pub struct PointDatabase {
   single_points : Map[Int, Bool]
   double_points : Map[Int, Int]
@@ -33,21 +90,83 @@ pub fn PointDatabase::set_energy_counter(Self, Int, Int64) -> Unit
 pub fn PointDatabase::set_single_point(Self, Int, Bool) -> Unit
 pub fn PointDatabase::set_telemetry_float(Self, Int, Double) -> Unit
 pub fn PointDatabase::set_telemetry_norm(Self, Int, Int) -> Unit
+pub fn PointDatabase::snapshot(Self, Int64) -> PointSnapshot
+
+pub struct PointSnapshot {
+  timestamp_ms : Int64
+  entries : Array[SnapshotEntry]
+} derive(Eq, @debug.Debug)
+pub fn PointSnapshot::count_kind(Self, SnapshotKind) -> Int
+pub fn PointSnapshot::entries(Self) -> Array[SnapshotEntry]
+pub fn PointSnapshot::find(Self, Int) -> SnapshotEntry?
+pub fn PointSnapshot::timestamp_ms(Self) -> Int64
+
+pub struct QueuedEvent {
+  sequence : Int
+  frame : @asdu.ASDU
+} derive(Eq, @debug.Debug)
+pub fn QueuedEvent::frame(Self) -> @asdu.ASDU
+pub fn QueuedEvent::sequence(Self) -> Int
+
+pub struct SelectBeforeExecute {
+  timeout_ms : Int64
+  mut selected_ioa : Int?
+  mut selected_state : Bool
+  mut selected_at : Int64
+} derive(Eq, @debug.Debug)
+pub fn SelectBeforeExecute::clear(Self) -> Unit
+pub fn SelectBeforeExecute::execute(Self, Int, @types.CommandQualifier, Int64) -> Result[CommandDecision, String]
+pub fn SelectBeforeExecute::is_selected(Self) -> Bool
+pub fn SelectBeforeExecute::new(Int64) -> Self
+pub fn SelectBeforeExecute::select(Self, Int, @types.CommandQualifier, Int64) -> Result[CommandDecision, String]
+pub fn SelectBeforeExecute::selected_ioa(Self) -> Int?
 
 pub struct SlaveNode {
   casdu : @types.CASDU
   db : PointDatabase
   conn : @state_machine.ConnectionState
-  spontaneous_queue : Array[@asdu.ASDU]
+  spontaneous_queue : EventQueue
 } derive(Eq, @debug.Debug)
 pub fn SlaveNode::casdu(Self) -> @types.CASDU
 pub fn SlaveNode::conn(Self) -> @state_machine.ConnectionState
 pub fn SlaveNode::db(Self) -> PointDatabase
+pub fn SlaveNode::drain_spontaneous(Self, Int) -> Array[QueuedEvent]
+pub fn SlaveNode::dropped_spontaneous_count(Self) -> Int
 pub fn SlaveNode::handle_apdu(Self, @apdu.APDU) -> Result[Array[@apdu.APDU], String]
 pub fn SlaveNode::new(Int) -> Self
+pub fn SlaveNode::pending_spontaneous_count(Self) -> Int
 pub fn SlaveNode::report_spontaneous_single_point(Self, Int, Bool) -> Result[@apdu.APDU, String]
+
+pub struct SnapshotEntry {
+  ioa : Int
+  kind : SnapshotKind
+  value : SnapshotValue
+} derive(Eq, @debug.Debug)
+pub fn SnapshotEntry::ioa(Self) -> Int
+pub fn SnapshotEntry::kind(Self) -> SnapshotKind
+pub fn SnapshotEntry::value(Self) -> SnapshotValue
+
+pub enum SnapshotKind {
+  SinglePoint
+  DoublePoint
+  NormalizedTelemetry
+  FloatTelemetry
+  EnergyCounter
+} derive(Eq, @debug.Debug)
+pub fn SnapshotKind::double_point() -> Self
+pub fn SnapshotKind::energy_counter() -> Self
+pub fn SnapshotKind::normalized_telemetry() -> Self
+pub fn SnapshotKind::single_point() -> Self
+pub fn SnapshotKind::telemetry_float() -> Self
+
+pub enum SnapshotValue {
+  Single(Bool)
+  Double(Int)
+  Normalized(Int)
+  Float(Double)
+  Counter(Int64)
+} derive(Eq, @debug.Debug)
 
 // Type aliases
 
 // Traits
-

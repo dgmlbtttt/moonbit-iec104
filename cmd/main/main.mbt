@@ -148,20 +148,8 @@ fn main {
   println(
     "\n[BENCH] Running APCI & ASDU Encoder/Decoder Throughput Benchmark...",
   )
-  let start_bench = 0
-  let mut encoded_count = 0
-  for _k = 0; _k < 100000; _k = _k + 1 {
-    let frame = @apdu.APDU::make_s(_k % 32767)
-    let bytes = @apdu.encode_apdu(frame)
-    let _ = @apdu.parse_apdu(bytes)
-    encoded_count = encoded_count + 1
-  }
-  let _ = start_bench
-  println(
-    "[BENCH] Processed " +
-    encoded_count.to_string() +
-    " APCI frame codec operations cleanly.",
-  )
+  let benchmark = run_apci_benchmark(100000)
+  println("[BENCH] " + benchmark.summary())
 
   println(
     "\n==========================================================================",

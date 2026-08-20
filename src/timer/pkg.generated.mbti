@@ -27,6 +27,20 @@ pub fn ProtocolTimerManager::stop_t1(Self) -> Unit
 pub fn ProtocolTimerManager::stop_t2(Self) -> Unit
 pub fn ProtocolTimerManager::tick(Self, Int) -> Array[TimerExpired]
 
+pub struct ProtocolTimerScheduler {
+  t1_ms : Int64
+  t2_ms : Int64
+  t3_ms : Int64
+  mut active : Array[TimerDeadline]
+  mut last_now_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn ProtocolTimerScheduler::active_count(Self) -> Int
+pub fn ProtocolTimerScheduler::arm(Self, TimerKind, Int64) -> Result[Unit, String]
+pub fn ProtocolTimerScheduler::cancel(Self, TimerKind) -> Bool
+pub fn ProtocolTimerScheduler::expired_at(Self, Int64) -> Result[Array[TimerKind], String]
+pub fn ProtocolTimerScheduler::is_active(Self, TimerKind) -> Bool
+pub fn ProtocolTimerScheduler::new(t1_ms? : Int64, t2_ms? : Int64, t3_ms? : Int64) -> Self
+
 pub struct TimerConfig {
   t1_seconds : Int
   t2_seconds : Int
@@ -38,6 +52,13 @@ pub fn TimerConfig::t1_seconds(Self) -> Int
 pub fn TimerConfig::t2_seconds(Self) -> Int
 pub fn TimerConfig::t3_seconds(Self) -> Int
 
+pub struct TimerDeadline {
+  kind : TimerKind
+  deadline_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn TimerDeadline::deadline_ms(Self) -> Int64
+pub fn TimerDeadline::kind(Self) -> TimerKind
+
 pub enum TimerExpired {
   ExpiredT1
   ExpiredT2
@@ -47,7 +68,15 @@ pub fn TimerExpired::expired_t1() -> Self
 pub fn TimerExpired::expired_t2() -> Self
 pub fn TimerExpired::expired_t3() -> Self
 
+pub enum TimerKind {
+  T1
+  T2
+  T3
+} derive(Eq, @debug.Debug)
+pub fn TimerKind::t1() -> Self
+pub fn TimerKind::t2() -> Self
+pub fn TimerKind::t3() -> Self
+
 // Type aliases
 
 // Traits
-

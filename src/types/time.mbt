@@ -112,6 +112,42 @@ pub fn CP56Time2a::to_bytes(self : CP56Time2a) -> Array[Byte] {
 }
 
 ///|
+pub fn CP56Time2a::validate(self : CP56Time2a) -> Result[Unit, String] {
+  if self.milliseconds < 0 || self.milliseconds > 59999 {
+    return Err("CP56Time2a milliseconds must be in 0..59999")
+  }
+  if self.minutes < 0 || self.minutes > 59 {
+    return Err("CP56Time2a minutes must be in 0..59")
+  }
+  if self.hours < 0 || self.hours > 23 {
+    return Err("CP56Time2a hours must be in 0..23")
+  }
+  if self.day_of_week < 1 || self.day_of_week > 7 {
+    return Err("CP56Time2a day_of_week must be in 1..7")
+  }
+  if self.day_of_month < 1 || self.day_of_month > 31 {
+    return Err("CP56Time2a day_of_month must be in 1..31")
+  }
+  if self.month < 1 || self.month > 12 {
+    return Err("CP56Time2a month must be in 1..12")
+  }
+  if self.year < 0 || self.year > 99 {
+    return Err("CP56Time2a year must be in 0..99")
+  }
+  Ok(())
+}
+
+///|
+pub fn CP56Time2a::encode_checked(
+  self : CP56Time2a,
+) -> Result[Array[Byte], String] {
+  match self.validate() {
+    Ok(_) => Ok(self.to_bytes())
+    Err(e) => Err(e)
+  }
+}
+
+///|
 pub fn CP56Time2a::from_bytes(
   bytes : Array[Byte],
 ) -> Result[CP56Time2a, String] {
@@ -140,7 +176,7 @@ pub fn CP56Time2a::from_bytes(
   let yr_byte = bytes[6].to_int()
   let year = yr_byte & 0x7F
 
-  Ok({
+  let result = {
     milliseconds: ms,
     minutes,
     invalid,
@@ -150,7 +186,11 @@ pub fn CP56Time2a::from_bytes(
     day_of_month,
     month,
     year,
-  })
+  }
+  match result.validate() {
+    Ok(_) => Ok(result)
+    Err(e) => Err(e)
+  }
 }
 
 ///|
@@ -241,6 +281,27 @@ pub fn CP24Time2a::to_bytes(self : CP24Time2a) -> Array[Byte] {
 }
 
 ///|
+pub fn CP24Time2a::validate(self : CP24Time2a) -> Result[Unit, String] {
+  if self.milliseconds < 0 || self.milliseconds > 59999 {
+    return Err("CP24Time2a milliseconds must be in 0..59999")
+  }
+  if self.minutes < 0 || self.minutes > 59 {
+    return Err("CP24Time2a minutes must be in 0..59")
+  }
+  Ok(())
+}
+
+///|
+pub fn CP24Time2a::encode_checked(
+  self : CP24Time2a,
+) -> Result[Array[Byte], String] {
+  match self.validate() {
+    Ok(_) => Ok(self.to_bytes())
+    Err(e) => Err(e)
+  }
+}
+
+///|
 pub fn CP24Time2a::from_bytes(
   bytes : Array[Byte],
 ) -> Result[CP24Time2a, String] {
@@ -255,5 +316,9 @@ pub fn CP24Time2a::from_bytes(
   let minutes = min_b & 0x3F
   let invalid = (min_b & 0x80) != 0
 
-  Ok({ milliseconds: ms, minutes, invalid })
+  let result = { milliseconds: ms, minutes, invalid }
+  match result.validate() {
+    Ok(_) => Ok(result)
+    Err(e) => Err(e)
+  }
 }

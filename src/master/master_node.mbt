@@ -6,6 +6,7 @@ pub struct MasterNode {
   conn : @state_machine.ConnectionState
   received_telemetry : Map[Int, Double]
   received_telesignals : Map[Int, Bool]
+  gi : InterrogationSession
 } derive(Debug, Eq)
 
 ///|
@@ -15,6 +16,7 @@ pub fn MasterNode::new(target_casdu_addr : Int) -> MasterNode {
     conn: @state_machine.ConnectionState::new(is_master=true),
     received_telemetry: Map([]),
     received_telesignals: Map([]),
+    gi: InterrogationSession::new(@types.CASDU::new(target_casdu_addr), 32),
   }
 }
 
@@ -39,9 +41,30 @@ pub fn MasterNode::received_telesignals(self : MasterNode) -> Map[Int, Bool] {
 }
 
 ///|
+pub fn MasterNode::interrogation_status(
+  self : MasterNode,
+) -> InterrogationStatus {
+  self.gi.status()
+}
+
+///|
+pub fn MasterNode::interrogation_batches(self : MasterNode) -> Int {
+  self.gi.batches()
+}
+
+///|
+pub fn MasterNode::interrogated_objects(self : MasterNode) -> Int {
+  self.gi.received_objects()
+}
+
+///|
 pub fn MasterNode::initiate_general_interrogation(
   self : MasterNode,
 ) -> Result[@apdu.APDU, String] {
+  match self.gi.start() {
+    Ok(_) => ()
+    Err(e) => return Err(e)
+  }
   let hdr = @asdu.ASDUHeader::create(
     type_id=@types.TYPE_C_IC_NA_1,
     num_objects=1,
@@ -111,6 +134,10 @@ pub fn MasterNode::handle_apdu(
     IFormat(_ns, _nr, payload) => {
       let asdu_frame = match @asdu.ASDU::decode(payload) {
         Ok(a) => a
+        Err(e) => return Err(e)
+      }
+      match self.gi.accept(asdu_frame) {
+        Ok(_) => ()
         Err(e) => return Err(e)
       }
       let elements = asdu_frame.elements()

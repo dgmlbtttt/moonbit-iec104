@@ -1,13 +1,27 @@
 // Generated using `moon info`, DON'T EDIT IT
 package "dgmlbtttt/iec104/cmd/main"
 
+import {
+  "moonbitlang/core/debug",
+}
+
 // Values
+pub fn run_apci_benchmark(Int) -> BenchmarkResult
 
 // Errors
 
 // Types and methods
+pub struct BenchmarkResult {
+  operations : Int
+  successful : Int
+  elapsed_us : Double
+} derive(Eq, @debug.Debug)
+pub fn BenchmarkResult::elapsed_us(Self) -> Double
+pub fn BenchmarkResult::operations(Self) -> Int
+pub fn BenchmarkResult::operations_per_second(Self) -> Double
+pub fn BenchmarkResult::successful(Self) -> Int
+pub fn BenchmarkResult::summary(Self) -> String
 
 // Type aliases
 
 // Traits
-

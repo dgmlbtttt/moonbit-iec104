@@ -5,7 +5,7 @@ pub struct SlaveNode {
   casdu : @types.CASDU
   db : PointDatabase
   conn : @state_machine.ConnectionState
-  spontaneous_queue : Array[@asdu.ASDU]
+  spontaneous_queue : EventQueue
 } derive(Debug, Eq)
 
 ///|
@@ -14,7 +14,7 @@ pub fn SlaveNode::new(casdu_addr : Int) -> SlaveNode {
     casdu: @types.CASDU::new(casdu_addr),
     db: PointDatabase::new(),
     conn: @state_machine.ConnectionState::new(is_master=false),
-    spontaneous_queue: [],
+    spontaneous_queue: EventQueue::new(256),
   }
 }
 
@@ -31,6 +31,24 @@ pub fn SlaveNode::db(self : SlaveNode) -> PointDatabase {
 ///|
 pub fn SlaveNode::conn(self : SlaveNode) -> @state_machine.ConnectionState {
   self.conn
+}
+
+///|
+pub fn SlaveNode::pending_spontaneous_count(self : SlaveNode) -> Int {
+  self.spontaneous_queue.len()
+}
+
+///|
+pub fn SlaveNode::dropped_spontaneous_count(self : SlaveNode) -> Int {
+  self.spontaneous_queue.dropped_count()
+}
+
+///|
+pub fn SlaveNode::drain_spontaneous(
+  self : SlaveNode,
+  limit : Int,
+) -> Array[QueuedEvent] {
+  self.spontaneous_queue.drain(limit)
 }
 
 ///|
@@ -170,5 +188,6 @@ pub fn SlaveNode::report_spontaneous_single_point(
     casdu=self.casdu,
   )
   let asdu = @asdu.ASDU::create(hdr, [elem])
+  let _ = self.spontaneous_queue.push(asdu)
   self.conn.send_i_frame(asdu.encode())
 }

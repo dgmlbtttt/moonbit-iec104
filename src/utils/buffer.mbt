@@ -267,7 +267,7 @@ pub fn ByteBuffer::read_bytes(
   self : ByteBuffer,
   count : Int,
 ) -> Result[Array[Byte], String] {
-  if self.read_pos + count > self.write_pos {
+  if count < 0 || self.read_pos + count > self.write_pos {
     return Err("Buffer underflow: read_bytes")
   }
   let res : Array[Byte] = Array::make(count, b'\x00')

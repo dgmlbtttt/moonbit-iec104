@@ -11,6 +11,16 @@ import {
 // Errors
 
 // Types and methods
+pub struct ConnectionAuditLog {
+  capacity : Int
+  mut entries : Array[TransitionRecord]
+} derive(Eq, @debug.Debug)
+pub fn ConnectionAuditLog::latest(Self) -> TransitionRecord?
+pub fn ConnectionAuditLog::len(Self) -> Int
+pub fn ConnectionAuditLog::new(Int) -> Self
+pub fn ConnectionAuditLog::record(Self, LinkStatus, LinkStatus, Int64) -> Unit
+pub fn ConnectionAuditLog::transitions_from(Self, LinkStatus) -> Int
+
 pub enum ConnectionEvent {
   EventConnected
   EventDisconnected
@@ -65,7 +75,15 @@ pub fn LinkStatus::stopped() -> Self
 pub fn LinkStatus::to_string(Self) -> String
 pub fn LinkStatus::unconnected() -> Self
 
+pub struct TransitionRecord {
+  from : LinkStatus
+  to : LinkStatus
+  at_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn TransitionRecord::at_ms(Self) -> Int64
+pub fn TransitionRecord::from(Self) -> LinkStatus
+pub fn TransitionRecord::to(Self) -> LinkStatus
+
 // Type aliases
 
 // Traits
-

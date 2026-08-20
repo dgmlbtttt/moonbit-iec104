@@ -45,4 +45,9 @@ test "Slave node General Interrogation handling" {
 
   // GI response should include: ActivationCon, GI data ASDUs, ActivationTerminated
   assert_true(res.length() >= 3)
+
+  let _ = slave.report_spontaneous_single_point(1002, false).unwrap()
+  assert_eq(slave.pending_spontaneous_count(), 1)
+  assert_eq(slave.drain_spontaneous(1).length(), 1)
+  assert_eq(slave.pending_spontaneous_count(), 0)
 }

@@ -7,6 +7,15 @@ import {
 }
 
 // Values
+pub fn information_object_width(Byte, Bool) -> Result[Int, String]
+
+pub fn type_has_cp24_time(Byte) -> Bool
+
+pub fn type_has_cp56_time(Byte) -> Bool
+
+pub fn type_is_sequence_compatible(Byte) -> Bool
+
+pub fn validate_object_count(Byte, Bool, Int, Int) -> Result[Unit, String]
 
 // Errors
 
@@ -19,7 +28,22 @@ pub fn ASDU::create(ASDUHeader, Array[InformationElement]) -> Self
 pub fn ASDU::decode(Array[Byte]) -> Result[Self, String]
 pub fn ASDU::elements(Self) -> Array[InformationElement]
 pub fn ASDU::encode(Self) -> Array[Byte]
+pub fn ASDU::encode_checked(Self) -> Result[Array[Byte], String]
 pub fn ASDU::header(Self) -> ASDUHeader
+pub fn ASDU::validate(Self) -> Result[Unit, String]
+
+pub struct ASDUBatchBuilder {
+  type_id : Byte
+  cot : Int
+  casdu : @types.CASDU
+  max_objects : Int
+  mut elements : Array[InformationElement]
+} derive(Eq, @debug.Debug)
+pub fn ASDUBatchBuilder::add(Self, InformationElement) -> Result[ASDU?, String]
+pub fn ASDUBatchBuilder::capacity(Self) -> Int
+pub fn ASDUBatchBuilder::flush(Self) -> ASDU?
+pub fn ASDUBatchBuilder::new(type_id~ : Byte, cot~ : Int, casdu~ : @types.CASDU, max_objects~ : Int) -> Self
+pub fn ASDUBatchBuilder::pending(Self) -> Int
 
 pub struct ASDUHeader {
   type_id : Byte
@@ -36,12 +60,26 @@ pub fn ASDUHeader::cot(Self) -> Int
 pub fn ASDUHeader::create(type_id~ : Byte, sq? : Bool, num_objects? : Int, cot~ : Int, is_test? : Bool, positive_ack? : Bool, oa? : Int, casdu~ : @types.CASDU) -> Self
 pub fn ASDUHeader::decode(Array[Byte]) -> Result[Self, String]
 pub fn ASDUHeader::encode(Self) -> Array[Byte]
+pub fn ASDUHeader::encode_checked(Self) -> Result[Array[Byte], String]
 pub fn ASDUHeader::is_test(Self) -> Bool
 pub fn ASDUHeader::num_objects(Self) -> Int
 pub fn ASDUHeader::oa(Self) -> Int
 pub fn ASDUHeader::positive_ack(Self) -> Bool
 pub fn ASDUHeader::sq(Self) -> Bool
 pub fn ASDUHeader::type_id(Self) -> Byte
+pub fn ASDUHeader::validate(Self) -> Result[Unit, String]
+
+pub struct CodecRegistry {
+  mut type_ids : Array[Byte]
+  max_types : Int
+} derive(Eq, @debug.Debug)
+pub fn CodecRegistry::contains(Self, Byte) -> Bool
+pub fn CodecRegistry::len(Self) -> Int
+pub fn CodecRegistry::new(Int) -> Self
+pub fn CodecRegistry::register(Self, Byte) -> Result[Unit, String]
+pub fn CodecRegistry::remove(Self, Byte) -> Bool
+pub fn CodecRegistry::supported_commands(Self) -> Array[Byte]
+pub fn CodecRegistry::supported_measurements(Self) -> Array[Byte]
 
 pub struct FaultWaveformBuffer {
   record_id : Int
@@ -119,4 +157,3 @@ pub fn InformationElement::step_position(@types.IOA, Int, @types.QDS, time56? : 
 // Type aliases
 
 // Traits
-

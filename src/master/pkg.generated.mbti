@@ -3,6 +3,7 @@ package "dgmlbtttt/iec104/src/master"
 
 import {
   "dgmlbtttt/iec104/src/apdu",
+  "dgmlbtttt/iec104/src/asdu",
   "dgmlbtttt/iec104/src/state_machine",
   "dgmlbtttt/iec104/src/types",
   "moonbitlang/core/debug",
@@ -13,15 +14,108 @@ import {
 // Errors
 
 // Types and methods
+pub struct CommandHistory {
+  capacity : Int
+  mut entries : Array[CommandHistoryEntry]
+} derive(Eq, @debug.Debug)
+pub fn CommandHistory::append(Self, CommandHistoryEntry) -> Unit
+pub fn CommandHistory::count_outcome(Self, CommandOutcome) -> Int
+pub fn CommandHistory::entries(Self) -> Array[CommandHistoryEntry]
+pub fn CommandHistory::len(Self) -> Int
+pub fn CommandHistory::new(Int) -> Self
+
+pub struct CommandHistoryEntry {
+  id : Int
+  ioa : Int
+  outcome : CommandOutcome
+  at_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn CommandHistoryEntry::at_ms(Self) -> Int64
+pub fn CommandHistoryEntry::id(Self) -> Int
+pub fn CommandHistoryEntry::ioa(Self) -> Int
+pub fn CommandHistoryEntry::new(id~ : Int, ioa~ : Int, outcome~ : CommandOutcome, at_ms~ : Int64) -> Self
+pub fn CommandHistoryEntry::outcome(Self) -> CommandOutcome
+
+pub enum CommandOutcome {
+  Accepted
+  Rejected
+  TimedOut
+  Completed
+} derive(Eq, @debug.Debug)
+pub fn CommandOutcome::accepted() -> Self
+pub fn CommandOutcome::completed() -> Self
+pub fn CommandOutcome::rejected() -> Self
+pub fn CommandOutcome::timed_out() -> Self
+
+pub struct ControlCommandQueue {
+  capacity : Int
+  max_attempts : Int
+  mut next_id : Int
+  mut current : QueuedCommand?
+  mut pending : Array[QueuedCommand]
+} derive(Eq, @debug.Debug)
+pub fn ControlCommandQueue::complete_current(Self) -> Bool
+pub fn ControlCommandQueue::enqueue(Self, Int, Bool) -> Result[Int, String]
+pub fn ControlCommandQueue::has_current(Self) -> Bool
+pub fn ControlCommandQueue::new(Int, Int) -> Self
+pub fn ControlCommandQueue::next(Self) -> QueuedCommand?
+pub fn ControlCommandQueue::pending_count(Self) -> Int
+pub fn ControlCommandQueue::retry_current(Self) -> Bool
+
+pub struct InterrogationSession {
+  target : @types.CASDU
+  batch_size : Int
+  mut phase : InterrogationStatus
+  mut batches : Int
+  mut objects : Int
+} derive(Eq, @debug.Debug)
+pub fn InterrogationSession::accept(Self, @asdu.ASDU) -> Result[Unit, String]
+pub fn InterrogationSession::batch_size(Self) -> Int
+pub fn InterrogationSession::batches(Self) -> Int
+pub fn InterrogationSession::new(@types.CASDU, Int) -> Self
+pub fn InterrogationSession::received_objects(Self) -> Int
+pub fn InterrogationSession::start(Self) -> Result[Unit, String]
+pub fn InterrogationSession::status(Self) -> InterrogationStatus
+
+pub enum InterrogationStatus {
+  Idle
+  AwaitingConfirmation
+  ReceivingData
+  Complete
+  Failed
+} derive(Eq, @debug.Debug)
+pub fn InterrogationStatus::complete() -> Self
+pub fn InterrogationStatus::receiving_data() -> Self
+
+pub struct LinkHealth {
+  mut received_frames : Int
+  mut sent_frames : Int
+  mut protocol_errors : Int
+  mut last_activity_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn LinkHealth::healthy(Self) -> Bool
+pub fn LinkHealth::last_activity_ms(Self) -> Int64
+pub fn LinkHealth::new() -> Self
+pub fn LinkHealth::protocol_errors(Self) -> Int
+pub fn LinkHealth::received_frames(Self) -> Int
+pub fn LinkHealth::record_error(Self) -> Unit
+pub fn LinkHealth::record_received(Self, Int64) -> Bool
+pub fn LinkHealth::record_sent(Self, Int64) -> Bool
+pub fn LinkHealth::sent_frames(Self) -> Int
+
 pub struct MasterNode {
   target_casdu : @types.CASDU
   conn : @state_machine.ConnectionState
   received_telemetry : Map[Int, Double]
   received_telesignals : Map[Int, Bool]
+  gi : InterrogationSession
 } derive(Eq, @debug.Debug)
 pub fn MasterNode::conn(Self) -> @state_machine.ConnectionState
 pub fn MasterNode::handle_apdu(Self, @apdu.APDU) -> Result[Unit, String]
 pub fn MasterNode::initiate_general_interrogation(Self) -> Result[@apdu.APDU, String]
+pub fn MasterNode::interrogated_objects(Self) -> Int
+pub fn MasterNode::interrogation_batches(Self) -> Int
+pub fn MasterNode::interrogation_status(Self) -> InterrogationStatus
 pub fn MasterNode::new(Int) -> Self
 pub fn MasterNode::received_telemetry(Self) -> Map[Int, Double]
 pub fn MasterNode::received_telesignals(Self) -> Map[Int, Bool]
@@ -29,7 +123,59 @@ pub fn MasterNode::send_clock_sync(Self, @types.CP56Time2a) -> Result[@apdu.APDU
 pub fn MasterNode::send_single_command(Self, Int, Bool, Bool) -> Result[@apdu.APDU, String]
 pub fn MasterNode::target_casdu(Self) -> @types.CASDU
 
+pub struct QueuedCommand {
+  id : Int
+  ioa : Int
+  state : Bool
+  attempts : Int
+} derive(Eq, @debug.Debug)
+pub fn QueuedCommand::attempts(Self) -> Int
+pub fn QueuedCommand::id(Self) -> Int
+pub fn QueuedCommand::ioa(Self) -> Int
+pub fn QueuedCommand::state(Self) -> Bool
+
+pub enum TelemetryQuality {
+  Good
+  Invalid
+  NotTopical
+  Blocked
+  Substituted
+} derive(Eq, @debug.Debug)
+pub fn TelemetryQuality::blocked() -> Self
+pub fn TelemetryQuality::good() -> Self
+pub fn TelemetryQuality::invalid() -> Self
+pub fn TelemetryQuality::is_usable(Self) -> Bool
+pub fn TelemetryQuality::not_topical() -> Self
+pub fn TelemetryQuality::substituted() -> Self
+
+pub struct TelemetrySample {
+  ioa : Int
+  value : Double
+  quality : TelemetryQuality
+  timestamp_ms : Int64
+  revision : Int
+} derive(Eq, @debug.Debug)
+pub fn TelemetrySample::ioa(Self) -> Int
+pub fn TelemetrySample::quality(Self) -> TelemetryQuality
+pub fn TelemetrySample::revision(Self) -> Int
+pub fn TelemetrySample::timestamp_ms(Self) -> Int64
+pub fn TelemetrySample::value(Self) -> Double
+
+pub struct TelemetryStore {
+  samples : Map[Int, TelemetrySample]
+  mut revision : Int
+  retention_ms : Int64
+} derive(Eq, @debug.Debug)
+pub fn TelemetryStore::count_quality(Self, TelemetryQuality) -> Int
+pub fn TelemetryStore::get(Self, Int) -> TelemetrySample?
+pub fn TelemetryStore::len(Self) -> Int
+pub fn TelemetryStore::new(Int64) -> Self
+pub fn TelemetryStore::remove(Self, Int) -> Bool
+pub fn TelemetryStore::retention_ms(Self) -> Int64
+pub fn TelemetryStore::stale_before(Self, Int64) -> Array[TelemetrySample]
+pub fn TelemetryStore::update(Self, Int, Double, TelemetryQuality, Int64) -> Bool
+pub fn TelemetryStore::usable_at(Self, Int, Int64) -> TelemetrySample?
+
 // Type aliases
 
 // Traits
-

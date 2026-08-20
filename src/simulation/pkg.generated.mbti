@@ -45,6 +45,48 @@ pub fn BatteryBESS::soc_percent(Self) -> Double
 pub fn BatteryBESS::status_ioa(Self) -> Int
 pub fn BatteryBESS::step_simulation(Self, Int) -> Unit
 
+pub enum DispatchMode {
+  Hold
+  Charge
+  Discharge
+} derive(Eq, @debug.Debug)
+pub fn DispatchMode::charge() -> Self
+pub fn DispatchMode::discharge() -> Self
+pub fn DispatchMode::hold() -> Self
+
+pub struct DispatchPlan {
+  actions : Array[ScheduledAction]
+  mut cursor : Int
+} derive(Eq, @debug.Debug)
+pub fn DispatchPlan::len(Self) -> Int
+pub fn DispatchPlan::new() -> Self
+pub fn DispatchPlan::pending(Self) -> Int
+pub fn DispatchPlan::run_step(Self, SubstationModel, Int) -> DispatchResult
+pub fn DispatchPlan::schedule_fault(Self, step~ : Int, bay_index~ : Int) -> Result[Unit, String]
+pub fn DispatchPlan::schedule_recovery(Self, step~ : Int, bay_index~ : Int) -> Result[Unit, String]
+
+pub struct DispatchResult {
+  actions_executed : Int
+  apdu_count : Int
+  rejected_actions : Int
+} derive(Eq, @debug.Debug)
+pub fn DispatchResult::actions_executed(Self) -> Int
+pub fn DispatchResult::apdu_count(Self) -> Int
+pub fn DispatchResult::rejected_actions(Self) -> Int
+
+pub struct EnergyDispatchPolicy {
+  min_soc : Double
+  max_soc : Double
+  max_power_kw : Double
+  mut mode : DispatchMode
+  mut requested_kw : Double
+} derive(Eq, @debug.Debug)
+pub fn EnergyDispatchPolicy::clear(Self) -> Unit
+pub fn EnergyDispatchPolicy::mode(Self) -> DispatchMode
+pub fn EnergyDispatchPolicy::new(min_soc~ : Double, max_soc~ : Double, max_power_kw~ : Double) -> Result[Self, String]
+pub fn EnergyDispatchPolicy::requested_kw(Self) -> Double
+pub fn EnergyDispatchPolicy::set_request(Self, DispatchMode, Double, Double) -> Result[Double, String]
+
 pub struct IDMTProtectionRelay {
   pickup_current_a : Double
   time_multiplier : Double
@@ -61,6 +103,29 @@ pub fn IDMTProtectionRelay::pickup_current_a(Self) -> Double
 pub fn IDMTProtectionRelay::reset(Self) -> Unit
 pub fn IDMTProtectionRelay::time_multiplier(Self) -> Double
 
+pub struct LimitEvaluation {
+  voltage_ok : Bool
+  current_ok : Bool
+  frequency_ok : Bool
+} derive(Eq, @debug.Debug)
+pub fn LimitEvaluation::current_ok(Self) -> Bool
+pub fn LimitEvaluation::frequency_ok(Self) -> Bool
+pub fn LimitEvaluation::is_safe(Self) -> Bool
+pub fn LimitEvaluation::voltage_ok(Self) -> Bool
+
+pub struct OperatingLimits {
+  min_voltage_kv : Double
+  max_voltage_kv : Double
+  max_current_a : Double
+  min_frequency_hz : Double
+  max_frequency_hz : Double
+} derive(Eq, @debug.Debug)
+pub fn OperatingLimits::current_ok(Self, Double) -> Bool
+pub fn OperatingLimits::evaluate(Self, Double, Double, Double) -> LimitEvaluation
+pub fn OperatingLimits::frequency_ok(Self, Double) -> Bool
+pub fn OperatingLimits::new(min_voltage_kv~ : Double, max_voltage_kv~ : Double, max_current_a~ : Double, min_frequency_hz~ : Double, max_frequency_hz~ : Double) -> Result[Self, String]
+pub fn OperatingLimits::voltage_ok(Self, Double) -> Bool
+
 pub enum RelayCurveType {
   StandardInverse
   VeryInverse
@@ -69,6 +134,87 @@ pub enum RelayCurveType {
 pub fn RelayCurveType::extremely_inverse() -> Self
 pub fn RelayCurveType::standard_inverse() -> Self
 pub fn RelayCurveType::very_inverse() -> Self
+
+pub struct ReplayLog {
+  capacity : Int
+  mut steps : Array[ReplayStep]
+} derive(Eq, @debug.Debug)
+pub fn ReplayLog::append(Self, ReplayStep) -> Result[Unit, String]
+pub fn ReplayLog::len(Self) -> Int
+pub fn ReplayLog::new(Int) -> Self
+pub fn ReplayLog::signature(Self) -> String
+pub fn ReplayLog::steps(Self) -> Array[ReplayStep]
+
+pub struct ReplayStep {
+  index : Int
+  elapsed_ms : Int
+  apdu_count : Int
+  breaker_open : Bool
+} derive(Eq, @debug.Debug)
+pub fn ReplayStep::apdu_count(Self) -> Int
+pub fn ReplayStep::breaker_open(Self) -> Bool
+pub fn ReplayStep::elapsed_ms(Self) -> Int
+pub fn ReplayStep::index(Self) -> Int
+pub fn ReplayStep::new(index~ : Int, elapsed_ms~ : Int, apdu_count~ : Int, breaker_open~ : Bool) -> Self
+
+pub struct RunningMetrics {
+  mut samples : Int
+  mut sum : Double
+  mut minimum : Double
+  mut maximum : Double
+  mut faults : Int
+} derive(Eq, @debug.Debug)
+pub fn RunningMetrics::average(Self) -> Double
+pub fn RunningMetrics::faults(Self) -> Int
+pub fn RunningMetrics::maximum(Self) -> Double
+pub fn RunningMetrics::minimum(Self) -> Double
+pub fn RunningMetrics::new() -> Self
+pub fn RunningMetrics::observe(Self, Double, Bool) -> Unit
+pub fn RunningMetrics::range(Self) -> Double
+pub fn RunningMetrics::reset(Self) -> Unit
+pub fn RunningMetrics::samples(Self) -> Int
+pub fn RunningMetrics::sum(Self) -> Double
+
+pub struct ScenarioConfig {
+  step_ms : Int
+  steps : Int
+  fault_step : Int
+  recovery_step : Int
+} derive(Eq, @debug.Debug)
+pub fn ScenarioConfig::create(step_ms~ : Int, steps~ : Int, fault_step~ : Int, recovery_step~ : Int) -> Result[Self, String]
+pub fn ScenarioConfig::step_ms(Self) -> Int
+pub fn ScenarioConfig::steps(Self) -> Int
+
+pub struct ScenarioEvent {
+  step : Int
+  elapsed_ms : Int
+  kind : ScenarioEventKind
+  apdu_count : Int
+} derive(Eq, @debug.Debug)
+pub fn ScenarioEvent::apdu_count(Self) -> Int
+pub fn ScenarioEvent::elapsed_ms(Self) -> Int
+pub fn ScenarioEvent::kind(Self) -> ScenarioEventKind
+pub fn ScenarioEvent::step(Self) -> Int
+
+pub enum ScenarioEventKind {
+  Fault
+  Recovery
+} derive(Eq, @debug.Debug)
+
+pub struct ScenarioReport {
+  steps : Int
+  events : Array[ScenarioEvent]
+  final_breaker_open : Bool
+} derive(Eq, @debug.Debug)
+pub fn ScenarioReport::events(Self) -> Array[ScenarioEvent]
+pub fn ScenarioReport::final_breaker_open(Self) -> Bool
+pub fn ScenarioReport::signature(Self) -> String
+pub fn ScenarioReport::steps(Self) -> Int
+
+pub enum ScheduledAction {
+  Fault(Int, Int)
+  Recovery(Int, Int)
+} derive(Eq, @debug.Debug)
 
 pub struct SolarPVInverter {
   inverter_id : String
@@ -144,6 +290,7 @@ pub struct SubstationModel {
 } derive(Eq, @debug.Debug)
 pub fn SubstationModel::activate_connection(Self) -> Unit
 pub fn SubstationModel::bays(Self) -> Array[SubstationBay]
+pub fn SubstationModel::clear_bay_fault(Self, Int) -> Bool
 pub fn SubstationModel::create(station_name? : String, casdu_addr? : Int) -> Self
 pub fn SubstationModel::generated_events_count(Self) -> Int
 pub fn SubstationModel::slave_node(Self) -> @slave.SlaveNode
@@ -151,7 +298,13 @@ pub fn SubstationModel::station_name(Self) -> String
 pub fn SubstationModel::step(Self, Int) -> Array[@apdu.APDU]
 pub fn SubstationModel::trigger_bay_fault(Self, Int) -> Array[@apdu.APDU]
 
+pub struct SubstationScenario {
+  config : ScenarioConfig
+  model : SubstationModel
+} derive(Eq, @debug.Debug)
+pub fn SubstationScenario::new(ScenarioConfig) -> Self
+pub fn SubstationScenario::run(Self) -> ScenarioReport
+
 // Type aliases
 
 // Traits
-

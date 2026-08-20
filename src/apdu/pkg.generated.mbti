@@ -6,9 +6,13 @@ import {
 }
 
 // Values
+pub const SEQUENCE_MODULUS : Int = 32768
+
 pub fn encode_apdu(APDU) -> Array[Byte]
 
 pub fn parse_apdu(Array[Byte]) -> Result[APDU, String]
+
+pub fn parse_apdu_diagnostic(Array[Byte]) -> Result[APDU, APDUDecodeError]
 
 // Errors
 
@@ -22,6 +26,61 @@ pub fn APDU::frame_type_name(Self) -> String
 pub fn APDU::make_i(Int, Int, Array[Byte]) -> Self
 pub fn APDU::make_s(Int) -> Self
 pub fn APDU::make_u(UFrameType) -> Self
+
+pub struct APDUDecodeError {
+  kind : APDUErrorKind
+  message : String
+  input_length : Int
+} derive(Eq, @debug.Debug)
+pub fn APDUDecodeError::input_length(Self) -> Int
+pub fn APDUDecodeError::kind(Self) -> APDUErrorKind
+pub fn APDUDecodeError::message(Self) -> String
+
+pub enum APDUErrorKind {
+  Truncated
+  InvalidPrefix
+  InvalidLength
+  UnsupportedFormat
+  InvalidUFrame
+  Unknown
+} derive(Eq, @debug.Debug)
+pub fn APDUErrorKind::invalid_length() -> Self
+pub fn APDUErrorKind::invalid_prefix() -> Self
+pub fn APDUErrorKind::invalid_u_frame() -> Self
+pub fn APDUErrorKind::truncated() -> Self
+pub fn APDUErrorKind::unknown() -> Self
+pub fn APDUErrorKind::unsupported_format() -> Self
+
+pub struct APDUStreamDecoder {
+  mut buffer : Array[Byte]
+  max_frame_length : Int
+} derive(@debug.Debug)
+pub fn APDUStreamDecoder::new() -> Self
+pub fn APDUStreamDecoder::pending_bytes(Self) -> Int
+pub fn APDUStreamDecoder::push(Self, Array[Byte]) -> Result[Array[APDU], String]
+pub fn APDUStreamDecoder::reset(Self) -> Unit
+
+pub struct ReliableSequenceWindow {
+  mut send_next : Int
+  mut receive_next_value : Int
+  mut send_acknowledged : Int
+  mut receive_acknowledged : Int
+  max_send : Int
+  ack_threshold : Int
+} derive(Eq, @debug.Debug)
+pub fn ReliableSequenceWindow::acknowledge(Self, Int) -> Result[Unit, String]
+pub fn ReliableSequenceWindow::acknowledged(Self) -> Int
+pub fn ReliableSequenceWindow::new(max_send? : Int, ack_threshold? : Int) -> Self
+pub fn ReliableSequenceWindow::pending_receive_ack(Self) -> Int
+pub fn ReliableSequenceWindow::pending_send(Self) -> Int
+pub fn ReliableSequenceWindow::receive(Self, Int) -> Result[Unit, String]
+pub fn ReliableSequenceWindow::receive_next(Self) -> Int
+pub fn ReliableSequenceWindow::reserve_send(Self) -> Result[Int, String]
+pub fn ReliableSequenceWindow::reset(Self) -> Unit
+pub fn ReliableSequenceWindow::send_next(Self) -> Int
+pub fn ReliableSequenceWindow::set_receive_sequence(Self, Int) -> Unit
+pub fn ReliableSequenceWindow::set_send_sequence(Self, Int) -> Unit
+pub fn ReliableSequenceWindow::should_ack(Self) -> Bool
 
 pub struct SequenceManager {
   mut send_seq : Int
@@ -43,6 +102,20 @@ pub fn SequenceManager::should_send_s_frame(Self) -> Bool
 pub fn SequenceManager::unacked_count(Self) -> Int
 pub fn SequenceManager::update_ack(Self, Int) -> Unit
 
+pub struct StreamStatistics {
+  mut chunks : Int
+  mut bytes : Int
+  mut frames : Int
+  mut errors : Int
+} derive(Eq, @debug.Debug)
+pub fn StreamStatistics::bytes(Self) -> Int
+pub fn StreamStatistics::chunks(Self) -> Int
+pub fn StreamStatistics::errors(Self) -> Int
+pub fn StreamStatistics::frames(Self) -> Int
+pub fn StreamStatistics::new() -> Self
+pub fn StreamStatistics::observe_chunk(Self, Int, Int, Bool) -> Bool
+pub fn StreamStatistics::reset(Self) -> Unit
+
 pub enum UFrameType {
   StartDTAct
   StartDTCon
@@ -63,4 +136,3 @@ pub fn UFrameType::to_byte(Self) -> Byte
 // Type aliases
 
 // Traits
-

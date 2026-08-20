@@ -11,16 +11,23 @@
 
 name = "dgmlbtttt/iec104"
 
-version = "0.1.0"
+version = "0.2.0"
 
 readme = "README.mbt.md"
 
-repository = ""
+repository = "https://github.com/dgmlbtttt/moonbit-iec104"
 
 license = "Apache-2.0"
 
-keywords = [ ]
+keywords = [
+  "iec104",
+  "scada",
+  "telecontrol",
+  "substation",
+  "protocol",
+  "industrial-automation",
+]
 
 preferred_target = "wasm-gc"
 
-description = ""
+description = "Pure MoonBit IEC 60870-5-104 protocol stack and deterministic substation simulation toolkit."

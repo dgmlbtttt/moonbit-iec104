@@ -26,6 +26,35 @@ test "CP56Time2a encoding and decoding" {
 }
 
 ///|
+test "time tags reject values outside IEC ranges" {
+  let bad56 = CP56Time2a::create(
+    milliseconds=60000,
+    minutes=60,
+    hours=24,
+    day_of_week=0,
+    day_of_month=0,
+    month=13,
+  )
+  assert_true(bad56.validate() is Err(_))
+  let bad24 = CP24Time2a::create(milliseconds=60000, minutes=60)
+  assert_true(bad24.validate() is Err(_))
+  assert_true(
+    CP56Time2a::from_bytes([
+      b'\x60', b'\xEA', b'\x3C', b'\x18', b'\x00', b'\x0D', b'\x7F',
+    ])
+    is Err(_),
+  )
+}
+
+///|
+test "time tags expose checked encoders" {
+  let valid = CP24Time2a::create(milliseconds=1234, minutes=12)
+  assert_eq(valid.encode_checked().unwrap().length(), 3)
+  let invalid = CP56Time2a::create(milliseconds=70000)
+  assert_true(invalid.encode_checked() is Err(_))
+}
+
+///|
 test "Quality descriptors encoding and decoding" {
   let qds = QDS::create(
     invalid=true,

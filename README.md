@@ -1,110 +1,98 @@
-# MoonBit IEC 60870-5-104 Telecontrol Protocol & Substation Automation Simulator
+# MoonBit IEC 60870-5-104
 
-[![MoonBit CI](https://github.com/dgmlbtttt/moonbit-iec104/actions/workflows/ci.yml/badge.svg)](https://github.com/dgmlbtttt/moonbit-iec104/actions/workflows/ci.yml)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
-[![MoonBit Version](https://img.shields.io/badge/MoonBit-0.10.3-brightgreen.svg)](https://www.moonbitlang.cn/)
+[![CI](https://github.com/dgmlbtttt/moonbit-iec104/actions/workflows/ci.yml/badge.svg)](https://github.com/dgmlbtttt/moonbit-iec104/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 
-`moonbit-iec104` is a pure **MoonBit** implementation of the **IEC 60870-5-104** industrial telecontrol protocol suite, designed for power grid automation, smart substations (110kV/35kV/10kV), distribution automation (DA), and SCADA supervisory systems.
+A pure MoonBit IEC 60870-5-104 telecontrol library with APCI/ASDU codecs, link state handling, bounded event delivery, master/slave helpers, and deterministic substation simulation. It is suitable for SCADA integration prototypes, edge telemetry adapters, protocol experiments, and reproducible test fixtures. It does not open sockets itself.
 
-It provides a high-performance APCI/ASDU frame encoder & decoder, connection state machine, sliding window flow control ($k=12, w=8$), protocol timer manager ($t_1, t_2, t_3$), substation RTU slave emulator, control center master node, microgrid solar PV / battery energy storage (BESS) models, IEC 60255 IDMT protection curves, and an interactive 110kV substation physical simulation engine.
+## Features
 
-- **Handwritten Source Code Scale**: **4,230 Lines** of pure `.mbt` code across 37 files (excluding `.mbti` generated files and compiler `_build` artifacts).
-- **Unit Test Coverage**: **32 Unit Tests**, 100% passed under `moon test --deny-warn`.
+- APCI I/S/U frames, incremental stream reassembly, structured diagnostics, and modulo-15-bit sequence windows.
+- ASDU headers, information elements, CP24/CP56 time tags, quality and address validation, object layouts, bounded batches, and codec registration.
+- Master GI tracking, telemetry freshness/quality storage, command retry/history, and link health counters.
+- Slave point snapshots, bounded spontaneous events, select-before-execute control, and alarm history.
+- Deterministic 110 kV substation, PV, BESS, protection, scenario, dispatch, replay, and benchmark components.
 
----
+## Repository layout
 
-## 🏛️ System Architecture
+| Path | Responsibility |
+| --- | --- |
+| `src/utils` | Buffers, readers, checksums, bit operations, bounded buffers, retry utilities. |
+| `src/types` | IEC identifiers, addresses, time tags, quality, limits, catalogs, validation. |
+| `src/apdu` | APCI frames, codecs, stream decoder, diagnostics, sequence windows. |
+| `src/asdu` | ASDU headers, information elements, file transfer, layouts, batches, registry. |
+| `src/state_machine` | Connection states, events, and transition audit history. |
+| `src/timer` | Protocol timers and deterministic deadlines. |
+| `src/master` | Master node, GI session, telemetry, command queue/history, health. |
+| `src/slave` | RTU node, point database, snapshots, events, control policy, alarms. |
+| `src/simulation` | Substation, microgrid, protection, scenarios, dispatch, replay, limits. |
+| `cmd/main` | Runnable integration demonstration and native APCI benchmark. |
 
-```mermaid
-graph TD
-    subgraph Master ["SCADA / Control Center Master Node"]
-        M1["Master Engine (@master)"]
-        M2["Command Dispatcher"]
-    end
+## Quick start
 
-    subgraph Channel ["IEC 60870-5-104 TCP/IP Transport Layer"]
-        C1["APCI Frame Encoder/Decoder (@apdu)"]
-        C2["State Machine & Flow Control ($k=12, w=8$) (@state_machine)"]
-        C3["Protocol Timers ($t_1, t_2, t_3$) (@timer)"]
-    end
+Install the current stable MoonBit toolchain, then run:
 
-    subgraph Substation ["Substation RTU / Slave Node (@slave)"]
-        S1["Slave Protocol Handler"]
-        S2["Point Database (Single/Double Signals, Telemetry, Counters) (@slave)"]
-        S3["ASDU Payload Codecs & File Transfer Buffer (@asdu)"]
-    end
-
-    subgraph Simulation ["110kV Substation Physical Automation Model (@simulation)"]
-        P1["Transformer Bay TR-1"]
-        P2["Feeder Bay FEEDER-1 & FEEDER-2"]
-        P3["Solar PV Inverter & Battery Energy Storage (BESS)"]
-        P4["IDMT Protection Relay (IEC 60255) & Overcurrent Fault Generator"]
-    end
-
-    Master <--> Channel
-    Channel <--> Substation
-    Substation <--> Simulation
-```
-
----
-
-## 📦 Package Overview & Source Structure
-
-| Package Name | Path | Description |
-| :--- | :--- | :--- |
-| `@utils` | `src/utils` | Byte buffer builder, bit manipulation, CRC16, LRC, sum8 checksums, IEEE-754 binary conversion. |
-| `@types` | `src/types` | ASDU Type IDs (1..105), Cause of Transmission (COT 1..47), QDS/SIQ/DIQ quality descriptors, CP56Time2a & CP24Time2a timestamps. |
-| `@apdu` | `src/apdu` | APCI frame structures (I-Frame, S-Frame, U-Frame), start/stop/test frame codecs, sequence number sliding window manager. |
-| `@asdu` | `src/asdu` | ASDU header parser/encoder, single/double point tele-signal, short float telemetry, set-point, GI ASDU codecs, file transfer. |
-| `@state_machine` | `src/state_machine` | IEC 104 connection state machine (`UNCONNECTED`, `STOPPED`, `PENDING_ACTIVE`, `ACTIVE`), sliding window ACK logic. |
-| `@timer` | `src/timer` | Protocol timers manager for $t_1$ (response timeout), $t_2$ (ACK timeout), $t_3$ (idle keepalive). |
-| `@slave` | `src/slave` | Substation RTU slave emulator, point database, GI response, control command echo & spontaneous event generator. |
-| `@master` | `src/master` | Control center master node, GI request builder, single/double command dispatcher, clock sync generator. |
-| `@simulation` | `src/simulation` | 110kV substation physical bay model, Solar PV, BESS storage, IDMT overcurrent protection relay & fault generator. |
-| `cmd/main` | `cmd/main` | Main interactive CLI verification application and throughput benchmark runner. |
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Install **MoonBit Toolchain** (v0.10.3 or higher):
-  ```bash
-  curl -fsSL https://cli.moonbitlang.com/install/powershell.ps1 | iex   # Windows
-  # or
-  curl -fsSL https://cli.moonbitlang.com/install/bash.sh | bash          # Linux/macOS
-  ```
-
-### Build & Run Verification Demo
 ```bash
-# Check code formatting & zero warning build
+moon version --all
+moon update
 moon fmt --check
-moon check --deny-warn
-moon info
-
-# Run full unit test suite (32 unit tests)
-moon test --deny-warn
-
-# Execute main interactive simulation demo & benchmark
-moon run cmd/main
+moon check --deny-warn --target all
+moon test --deny-warn --target wasm-gc
 ```
 
----
+On Unix-like systems, the native test and demonstration can also be run:
 
-## 🧪 Benchmark & Performance
+```bash
+moon test --deny-warn --target native
+moon run --target native cmd/main
+```
 
-`moonbit-iec104` has achieved **>100,000 APCI frame codec operations per second** in pure MoonBit on standard desktop hardware with zero memory leaks and complete type safety.
+The CLI exercises link startup, general interrogation, telemetry, protection, remote control, and the codec benchmark. The benchmark prints operation count, elapsed microseconds, and throughput measured during that run; results are machine-dependent and are not hard-coded here.
 
----
+## Library usage
 
-## 📄 Open Source License
+```moonbit
+import {
+  "dgmlbtttt/iec104/src/apdu"
+  "dgmlbtttt/iec104/src/types"
+}
 
-This project is licensed under the **Apache License 2.0**. See the [LICENSE](LICENSE) file for details.
+fn encode_status() -> Array[Byte] {
+  @apdu.encode_apdu(@apdu.APDU::make_s(12))
+}
+```
 
----
+For transport input, create `@apdu.APDUStreamDecoder`, pass each received byte chunk to `push`, and handle the complete frames returned. Malformed input is returned as an error without unbounded buffering.
 
-## 🏷️ Project Source & Attribution Statement
+## Testing and quality gates
 
-- **Project Source**: This repository is **100% original software** developed by `dgmlbtttt` for the OSC 2026 Competition. No code has been plagiarized or copied from third-party repositories.
-- **AI Tooling Statement**: Developed with AI pair-programming assistance (Google Antigravity / Gemini) for architectural design, test case generation, and standard documentation according to OSC 2026 guidelines.
-- **Git Contributor**: Single authentic developer account `dgmlbtttt <dgmlbtttt@users.noreply.github.com>`.
+CI runs the stable toolchain on Ubuntu, macOS, and Windows. It checks all targets, runs the complete test suite, formats the project, regenerates public interfaces, and verifies generated changes are committed.
+
+```bash
+moon check --deny-warn --target all
+moon test --deny-warn --target wasm-gc
+moon fmt
+moon info
+moon coverage analyze
+```
+
+Count actual MoonBit source lines without interfaces or build artifacts:
+
+```powershell
+$lines = rg --files -g '*.mbt' | ForEach-Object { (Get-Content -LiteralPath $_ | Measure-Object -Line).Lines }
+($lines | Measure-Object -Sum).Sum
+```
+
+## Publishing
+
+The module namespace is `dgmlbtttt/iec104`, matching the GitHub account namespace used for Mooncakes publishing. After local checks, authenticate with `moon login` and run:
+
+```bash
+moon publish
+```
+
+A manual GitHub Actions workflow provides a guarded publish job using a `MOONCAKES_TOKEN` secret.
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
