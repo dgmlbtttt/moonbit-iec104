@@ -68,6 +68,8 @@ For transport input, create `@apdu.APDUStreamDecoder`, pass each received byte c
 
 CI runs the stable toolchain on Ubuntu, macOS, and Windows. It checks all targets, runs the complete test suite, formats the project, regenerates public interfaces, and verifies generated changes are committed.
 
+The test suite covers the core protocol paths and boundary conditions, including malformed frames, sequence-window limits, time and address validation, bounded queues, command policies, and deterministic simulation scenarios.
+
 ```bash
 moon check --deny-warn --target all
 moon test --deny-warn --target wasm-gc
